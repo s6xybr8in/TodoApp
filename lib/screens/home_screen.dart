@@ -19,9 +19,21 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('나의 투두리스트'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Theme.of(context).colorScheme.onPrimary,
+        title: const Text('Todo App'),
+        elevation: 0, // for a flatter look
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color(0xFF4F46E5), // indigo
+                Color(0xFF7C3AED), // violet
+                Color(0xFF2563EB), // blue
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       // ValueListenableBuilder를 사용하여 Hive Box의 변경사항을 실시간으로 감지합니다.
       body: ValueListenableBuilder(
@@ -43,7 +55,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 todo: todo,
                 onCheckboxChanged: (bool? value) {
                   // 체크박스 상태가 변경되면 Hive에 저장된 객체를 업데이트합니다.
-                  todo.isCompleted = value ?? false;
+                  todo.isDone = value ?? false;
+                  todo.progress = todo.isDone ? 100 : todo.progress;
                   todo.save();
                 },
                 onTap: () {

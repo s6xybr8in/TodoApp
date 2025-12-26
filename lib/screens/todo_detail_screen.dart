@@ -27,7 +27,7 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
     _importance = widget.todo?.importance ?? Importance.medium;
     _progress = widget.todo?.progress ?? 0;
     _startDate = widget.todo?.startDate ?? DateTime.now();
-    _endDate = widget.todo?.endDate ?? DateTime.now().add(const Duration(days: 1));
+    _endDate = widget.todo?.endDate ?? DateTime.now();
   }
 
   void _saveTodo() {
@@ -65,11 +65,12 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.todo == null ? '새 투두 추가' : '투두 수정'),
+        title: Text(widget.todo == null ? '새 Todo 추가' : 'Todo'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.save),
+            icon: const Icon(Icons.check),
             onPressed: _saveTodo,
+            padding: const EdgeInsets.only(right: 20.0),
           ),
         ],
       ),
@@ -114,8 +115,8 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
                     _importance = value!;
                   });
                 },
-              ),
-              const SizedBox(height: 16),
+            ),  
+             
               // 진행률 슬라이더
               Row(
                 children: [

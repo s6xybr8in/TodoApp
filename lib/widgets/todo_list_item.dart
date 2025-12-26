@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todoapp/models/todo.dart';
+import 'package:todo/models/todo.dart';
 
 class TodoListItem extends StatelessWidget {
   final Todo todo;
@@ -15,53 +15,88 @@ class TodoListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ListTile(
-        onTap: onTap,
-        leading: Checkbox(
-          value: todo.isCompleted,
-          onChanged: onCheckboxChanged,
-        ),
-        title: Text(
-          todo.title,
-          style: TextStyle(
-            decoration: todo.isCompleted ? TextDecoration.lineThrough : null,
-            color: todo.isCompleted ? Colors.grey : null,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 4),
-            LinearProgressIndicator(
-              value: todo.progress / 100,
-              backgroundColor: Colors.grey[300],
-              valueColor: AlwaysStoppedAnimation<Color>(
-                _getImportanceColor(todo.importance).withOpacity(0.7),
-              ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Chip(
-                  label: Text(
-                    todo.importance.name,
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                  backgroundColor: _getImportanceColor(todo.importance).withOpacity(0.2),
-                  padding: EdgeInsets.zero,
-                ),
-                const Spacer(),
-                Text(
-                  '${todo.startDate.toString().substring(5, 10)} ~ ${todo.endDate.toString().substring(5, 10)}',
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                ),
-              ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.1),
+              spreadRadius: 1,
+              blurRadius: 5,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
-        isThreeLine: true,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Checkbox(
+                  value: todo.isDone,
+                  onChanged: onCheckboxChanged,
+                  activeColor: _getImportanceColor(todo.importance),
+                ),
+                Expanded(
+                  child: Text(
+                    todo.title,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      decoration: todo.isDone ? TextDecoration.lineThrough : null,
+                      color: todo.isDone ? Colors.grey : Colors.black87,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (todo.progress > 0) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: LinearProgressIndicator(
+                  value: todo.progress / 100,
+                  backgroundColor: Colors.grey[200],
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    _getImportanceColor(todo.importance),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+            ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: Row(
+                children: [
+                  Chip(
+                    label: Text(
+                      todo.importance.name,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: _getImportanceColor(todo.importance),
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    backgroundColor: _getImportanceColor(todo.importance).withOpacity(0.1),
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    visualDensity: VisualDensity.compact,
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${todo.startDate.toString().substring(5, 10)} ~ ${todo.endDate.toString().substring(5, 10)}',
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -69,11 +104,11 @@ class TodoListItem extends StatelessWidget {
   Color _getImportanceColor(Importance importance) {
     switch (importance) {
       case Importance.high:
-        return Colors.redAccent;
+        return const Color(0xFFE53935); // Material Red
       case Importance.medium:
-        return Colors.orangeAccent;
+        return const Color(0xFF7C3AED); // Theme Secondary
       case Importance.low:
-        return Colors.blueAccent;
+        return const Color(0xFF42A5F5); // Light Blue
       default:
         return Colors.grey;
     }

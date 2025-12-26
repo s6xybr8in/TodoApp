@@ -23,7 +23,7 @@ class TodoAdapter extends TypeAdapter<Todo> {
       progress: fields[3] as int,
       startDate: fields[4] as DateTime,
       endDate: fields[5] as DateTime,
-      isCompleted: fields[6] as bool,
+      isDone: fields[6] as bool,
     );
   }
 
@@ -44,7 +44,7 @@ class TodoAdapter extends TypeAdapter<Todo> {
       ..writeByte(5)
       ..write(obj.endDate)
       ..writeByte(6)
-      ..write(obj.isCompleted);
+      ..write(obj.isDone);
   }
 
   @override

@@ -3,6 +3,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo/models/todo.dart';
 import 'package:todo/screens/home_screen.dart';
 
+int selected_index = 0;
+
 void main() async {
   // Flutter 앱이 시작되기 전에 Hive를 초기화합니다.
   await Hive.initFlutter();
@@ -23,10 +25,33 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'TodoApp',
+      debugShowCheckedModeBanner: false,
+      title: 'Todo App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
         useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF4F46E5), // Primary color from SVG
+          primary: const Color(0xFF4F46E5), // Indigo
+          secondary: const Color(0xFF7C3AED), // Violet
+          surface: Colors.white,
+          background: Colors.white,
+          // Rest of the colors can be derived or set explicitly
+        ),
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF4F46E5),
+          foregroundColor: Colors.white, // For title and icons
+        ),
+        floatingActionButtonTheme: const FloatingActionButtonThemeData(
+          backgroundColor: Color(0xFF4F46E5),
+          foregroundColor: Colors.white,
+        ),
+        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+          backgroundColor: Color(0xFF4F46E5),
+          selectedItemColor: Colors.white,
+          unselectedItemColor: Colors.white70,
+          current
+        )
       ),
       home: const HomeScreen(),
     );
