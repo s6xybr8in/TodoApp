@@ -39,13 +39,14 @@ class _HomeScreenState extends State<HomeScreen> {
       body: ValueListenableBuilder(
         valueListenable: todoBox.listenable(),
         builder: (context, Box<Todo> box, _) {
-          if (box.values.isEmpty) {
+          // Hive Box에서 isDone이 false인 Todo 목록을 가져옵니다.
+          final todos = box.values.where((todo) => !todo.isDone).toList().cast<Todo>();
+
+          if (todos.isEmpty) {
             return const Center(
-              child: Text('아직 추가된 투두가 없어요!'),
+              child: Text('완료할 투두가 없어요!'),
             );
           }
-          // Hive Box에서 Todo 목록을 가져옵니다.
-          final todos = box.values.toList().cast<Todo>();
 
           return ListView.builder(
             itemCount: todos.length,

@@ -54,6 +54,21 @@ class TodoListItem extends StatelessWidget {
                     ),
                   ),
                 ),
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'delete') {
+                      todo.delete();
+                    }
+                  },
+                  itemBuilder: (BuildContext context) {
+                    return [
+                      const PopupMenuItem<String>(
+                        value: 'delete',
+                        child: Text('삭제'),
+                      ),
+                    ];
+                  },
+                ),
               ],
             ),
             const SizedBox(height: 8),

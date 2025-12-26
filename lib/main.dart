@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo/models/todo.dart';
-import 'package:todo/screens/home_screen.dart';
+import 'package:todo/screens/main_screen.dart';
 
 int selected_index = 0;
 
@@ -46,14 +46,8 @@ class MyApp extends StatelessWidget {
           backgroundColor: Color(0xFF4F46E5),
           foregroundColor: Colors.white,
         ),
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-          backgroundColor: Color(0xFF4F46E5),
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.white70,
-          current
-        )
       ),
-      home: const HomeScreen(),
+      home: const MainScreen(),
     );
   }
 }
