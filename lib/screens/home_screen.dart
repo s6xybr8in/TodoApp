@@ -57,6 +57,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 onCheckboxChanged: (bool? value) {
                   // 체크박스 상태가 변경되면 Hive에 저장된 객체를 업데이트합니다.
                   todo.isDone = value ?? false;
+                  if (todo.isDone) {
+                    todo.doneDate = DateTime.now();
+                  } else {
+                    todo.doneDate = null;
+                  }
                   todo.progress = todo.isDone ? 100 : todo.progress;
                   todo.save();
                 },

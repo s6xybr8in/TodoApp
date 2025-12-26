@@ -17,6 +17,12 @@ class _DoneScreenState extends State<DoneScreen> {
   DateTime? _selectedDay;
 
   @override
+  void initState() {
+    super.initState();
+    _selectedDay = _focusedDay;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final Box<Todo> todoBox = Hive.box<Todo>('todos');
 
@@ -40,11 +46,24 @@ class _DoneScreenState extends State<DoneScreen> {
       body: ValueListenableBuilder(
         valueListenable: todoBox.listenable(),
         builder: (context, Box<Todo> box, _) {
-          final doneTodos = box.values.where((todo) => todo.isDone).toList();
+          final doneTodos = box.values
+              .where((todo) =>
+                  todo.isDone &&
+                  _selectedDay != null &&
+                  isSameDay(todo.doneDate, _selectedDay))
+              .toList();
+
+          List<DateTime> events = box.values
+              .where((todo) => todo.isDone && todo.doneDate != null)
+              .map((todo) => todo.doneDate!)
+              .toList();
 
           return Column(
             children: [
               TableCalendar(
+                eventLoader: (day) {
+                  return events.where((event) => isSameDay(event, day)).toList();
+                },
                 firstDay: DateTime.utc(2020, 1, 1),
                 lastDay: DateTime.utc(2030, 12, 31),
                 focusedDay: _focusedDay,
@@ -67,7 +86,7 @@ class _DoneScreenState extends State<DoneScreen> {
                     shape: BoxShape.circle,
                   ),
                 ),
-                 headerStyle: const HeaderStyle(
+                headerStyle: const HeaderStyle(
                   formatButtonVisible: false,
                   titleCentered: true,
                 ),
@@ -76,7 +95,7 @@ class _DoneScreenState extends State<DoneScreen> {
               Expanded(
                 child: doneTodos.isEmpty
                     ? const Center(
-                        child: Text('완료된 투두가 없어요!'),
+                        child: Text('선택한 날짜에 완료된 투두가 없어요!'),
                       )
                     : ListView.builder(
                         itemCount: doneTodos.length,
@@ -86,12 +105,16 @@ class _DoneScreenState extends State<DoneScreen> {
                             todo: todo,
                             onCheckboxChanged: (bool? value) {
                               todo.isDone = value ?? false;
+                              if (!todo.isDone) {
+                                todo.doneDate = null;
+                              }
                               todo.save();
                             },
                             onTap: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (context) => TodoDetailScreen(todo: todo),
+                                  builder: (context) =>
+                                      TodoDetailScreen(todo: todo),
                                 ),
                               );
                             },

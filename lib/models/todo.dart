@@ -36,6 +36,9 @@ class Todo extends HiveObject {
   @HiveField(6)
   bool isDone;
 
+  @HiveField(7)
+  DateTime? doneDate;
+
   Todo({
     required this.id,
     required this.title,
@@ -44,6 +47,7 @@ class Todo extends HiveObject {
     required this.startDate,
     required this.endDate,
     this.isDone = false,
+    this.doneDate,
   });
 
   // JSON 직렬화를 위한 팩토리 생성자
@@ -56,6 +60,7 @@ class Todo extends HiveObject {
       startDate: DateTime.parse(json['startDate']),
       endDate: DateTime.parse(json['endDate']),
       isDone: json['isCompleted'],
+      doneDate: json['doneDate'] != null ? DateTime.parse(json['doneDate']) : null,
     );
   }
 
@@ -69,6 +74,7 @@ class Todo extends HiveObject {
       'startDate': startDate.toIso8601String(),
       'endDate': endDate.toIso8601String(),
       'isCompleted': isDone,
+      'doneDate': doneDate?.toIso8601String(),
     };
   }
 }
