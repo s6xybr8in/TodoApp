@@ -33,8 +33,8 @@ class MyApp extends StatelessWidget {
           seedColor: const Color(0xFF4F46E5), // Primary color from SVG
           primary: const Color(0xFF4F46E5), // Indigo
           secondary: const Color(0xFF7C3AED), // Violet
-          surface: Colors.white,
-          background: Colors.white,
+          surface: Colors.white
+          //background: Colors.white,
           // Rest of the colors can be derived or set explicitly
         ),
         scaffoldBackgroundColor: Colors.white,

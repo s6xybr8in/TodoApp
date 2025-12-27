@@ -7,6 +7,8 @@
 .buildlog/
 .history
 
+# gemini cli
+/GEMINI.md
 
 
 # Flutter repo-specific

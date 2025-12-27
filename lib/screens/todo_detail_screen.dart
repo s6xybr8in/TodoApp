@@ -99,7 +99,7 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
               const SizedBox(height: 16),
               // 중요도 선택
               DropdownButtonFormField<Importance>(
-                value: _importance,
+                //value: _importance,
                 decoration: const InputDecoration(
                   labelText: '중요도',
                   border: OutlineInputBorder(),

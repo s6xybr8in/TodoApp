@@ -59,7 +59,7 @@ class Todo extends HiveObject {
       progress: json['progress'],
       startDate: DateTime.parse(json['startDate']),
       endDate: DateTime.parse(json['endDate']),
-      isDone: json['isCompleted'],
+      isDone: json['isDone'],
       doneDate: json['doneDate'] != null ? DateTime.parse(json['doneDate']) : null,
     );
   }
@@ -73,7 +73,7 @@ class Todo extends HiveObject {
       'progress': progress,
       'startDate': startDate.toIso8601String(),
       'endDate': endDate.toIso8601String(),
-      'isCompleted': isDone,
+      'isDone': isDone,
       'doneDate': doneDate?.toIso8601String(),
     };
   }

@@ -42,6 +42,17 @@ class _HomeScreenState extends State<HomeScreen> {
           // Hive Box에서 isDone이 false인 Todo 목록을 가져옵니다.
           final todos = box.values.where((todo) => !todo.isDone).toList().cast<Todo>();
 
+          // 중요도(내림차순), 그다음 제목(오름차순)으로 목록을 정렬합니다.
+          todos.sort((a, b) {
+            // 중요도를 기준으로 비교합니다. (high > medium > low)
+            final importanceCompare = b.importance.index.compareTo(a.importance.index);
+            if (importanceCompare != 0) {
+              return importanceCompare;
+            }
+            // 중요도가 같으면 제목을 기준으로 오름차순으로 비교합니다.
+            return a.title.compareTo(b.title);
+          });
+
           if (todos.isEmpty) {
             return const Center(
               child: Text('완료할 투두가 없어요!'),

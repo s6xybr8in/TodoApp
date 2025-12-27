@@ -26,7 +26,7 @@ class TodoListItem extends StatelessWidget {
           border: Border.all(color: Colors.grey.shade200),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey,
               spreadRadius: 1,
               blurRadius: 5,
               offset: const Offset(0, 2),
@@ -64,7 +64,7 @@ class TodoListItem extends StatelessWidget {
                     return [
                       const PopupMenuItem<String>(
                         value: 'delete',
-                        child: Text('삭제'),
+                        child: Text('Delete'),
                       ),
                     ];
                   },
@@ -98,7 +98,7 @@ class TodoListItem extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    backgroundColor: _getImportanceColor(todo.importance).withOpacity(0.1),
+                    backgroundColor: _getImportanceColor(todo.importance),
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     visualDensity: VisualDensity.compact,
                   ),
@@ -124,8 +124,6 @@ class TodoListItem extends StatelessWidget {
         return const Color(0xFF7C3AED); // Theme Secondary
       case Importance.low:
         return const Color(0xFF42A5F5); // Light Blue
-      default:
-        return Colors.grey;
     }
   }
 }
