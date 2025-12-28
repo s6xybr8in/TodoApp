@@ -10,6 +10,9 @@
 # gemini cli
 /GEMINI.md
 
+#token files
+*token.*
+
 
 # Flutter repo-specific
 /bin/cache/

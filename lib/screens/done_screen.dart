@@ -28,7 +28,7 @@ class _DoneScreenState extends State<DoneScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Done Todos'),
+        title: const Text('Done Todos', style: TextStyle(fontWeight: FontWeight.bold)),
           flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(

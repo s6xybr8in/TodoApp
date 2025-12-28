@@ -91,14 +91,14 @@ class TodoListItem extends StatelessWidget {
                 children: [
                   Chip(
                     label: Text(
-                      todo.importance.name,
+                      "${todo.importance.name.toUpperCase()}",
                       style: TextStyle(
                         fontSize: 12,
                         color: _getImportanceColor(todo.importance),
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    backgroundColor: _getImportanceColor(todo.importance),
+                    // backgroundColor: _getImportanceColor(todo.importance),
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     visualDensity: VisualDensity.compact,
                   ),

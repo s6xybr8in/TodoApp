@@ -23,7 +23,19 @@ class MoreScreen extends StatelessWidget {
         ),
       ),
       body: const Center(
-        child: Text('More information will be here.'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+
+            Image(
+              image: AssetImage('../../assets/icons/char.png'),
+              width: 300,
+              height: 300,
+            ),
+            SizedBox(height: 16),
+            Text('More information will be here.'),
+          ],
+        ),
       ),
     );
   }

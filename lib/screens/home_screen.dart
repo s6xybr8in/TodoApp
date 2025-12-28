@@ -18,8 +18,9 @@ class _HomeScreenState extends State<HomeScreen> {
     final Box<Todo> todoBox = Hive.box<Todo>('todos');
 
     return Scaffold(
+
       appBar: AppBar(
-        title: const Text('Todo App'),
+        title: const Text('Todo App', style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0, // for a flatter look
         flexibleSpace: Container(
           decoration: const BoxDecoration(
