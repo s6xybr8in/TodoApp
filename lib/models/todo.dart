@@ -1,4 +1,6 @@
 import 'package:hive/hive.dart';
+import 'package:table_calendar/table_calendar.dart';
+import 'package:todo/models/daily.dart';
 
 part 'todo.g.dart';
 
@@ -39,6 +41,9 @@ class Todo extends HiveObject {
   @HiveField(7)
   DateTime? doneDate;
 
+  @HiveField(8)
+  String className;
+
   Todo({
     required this.id,
     required this.title,
@@ -48,33 +53,26 @@ class Todo extends HiveObject {
     required this.endDate,
     this.isDone = false,
     this.doneDate,
+    this.className = '',
   });
+  Future<void> markAsDone() async {
+    if (isDone) return; // 이미 완료된 경우 중복 실행 방지
+    isDone = true;
+    progress = 100;
+    doneDate = DateTime.now();
+    await save(); // Todo 객체의 상태를 먼저 저장
 
-  // JSON 직렬화를 위한 팩토리 생성자
-  factory Todo.fromJson(Map<String, dynamic> json) {
-    return Todo(
-      id: json['id'],
-      title: json['title'],
-      importance: Importance.values[json['importance']],
-      progress: json['progress'],
-      startDate: DateTime.parse(json['startDate']),
-      endDate: DateTime.parse(json['endDate']),
-      isDone: json['isDone'],
-      doneDate: json['doneDate'] != null ? DateTime.parse(json['doneDate']) : null,
-    );
+    await Daily.markTodoAsDone(this);
   }
 
-  // JSON 직렬화를 위한 메서드
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'title': title,
-      'importance': importance.index,
-      'progress': progress,
-      'startDate': startDate.toIso8601String(),
-      'endDate': endDate.toIso8601String(),
-      'isDone': isDone,
-      'doneDate': doneDate?.toIso8601String(),
-    };
+  Future<void> markAsUndone() async {
+    if (!isDone) return; // 이미 미완료인 경우 중복 실행 방지
+    final oldDoneDate = doneDate; // 날짜 정보를 지우기 전에 백업
+    isDone = false;
+    progress = 0; // 진행률 초기화
+    doneDate = null;
+    await save(); // Todo 객체의 상태를 먼저 저장
+    
+    await Daily.markTodoAsUndone(this,oldDoneDate);
   }
 }

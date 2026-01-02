@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:todo/models/todo.dart';
-import 'package:todo/screens/main_screen.dart';
-
+import '/models/daily.dart';
+import '/models/todo.dart';
+import '/screens/main_screen.dart';
+//import 'api/naver_token.dart';
 int selected_index = 0;
 
 void main() async {
@@ -12,10 +13,11 @@ void main() async {
   // Hive 어댑터를 등록합니다.
   Hive.registerAdapter(TodoAdapter());
   Hive.registerAdapter(ImportanceAdapter());
+  Hive.registerAdapter(DailyAdapter());
 
   // 'todos'라는 이름의 Box를 엽니다.
   await Hive.openBox<Todo>('todos');
-
+  await Hive.openBox<Daily>('dailies'); 
   runApp(const MyApp());
 }
 

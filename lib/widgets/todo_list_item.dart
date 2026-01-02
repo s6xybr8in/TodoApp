@@ -4,13 +4,11 @@ import 'package:todo/models/todo.dart';
 class TodoListItem extends StatelessWidget {
   final Todo todo;
   final VoidCallback onTap;
-  final ValueChanged<bool?> onCheckboxChanged;
 
   const TodoListItem({
     super.key,
     required this.todo,
     required this.onTap,
-    required this.onCheckboxChanged,
   });
 
   @override
@@ -40,8 +38,15 @@ class TodoListItem extends StatelessWidget {
               children: [
                 Checkbox(
                   value: todo.isDone,
-                  onChanged: onCheckboxChanged,
+                  onChanged: (bool? value) {
+                              if (value == true) {
+                                todo.markAsDone();
+                              } else {
+                                todo.markAsUndone();
+                              }
+                  },
                   activeColor: _getImportanceColor(todo.importance),
+                  
                 ),
                 Expanded(
                   child: Text(
@@ -59,12 +64,21 @@ class TodoListItem extends StatelessWidget {
                     if (value == 'delete') {
                       todo.delete();
                     }
+                    else if (value == 'cascade_delete') {
+                      if(!todo.className.isEmpty){
+                        // todo.delete_cascade();
+                      }
+                    }
                   },
                   itemBuilder: (BuildContext context) {
                     return [
                       const PopupMenuItem<String>(
                         value: 'delete',
-                        child: Text('Delete'),
+                        child: Text('삭제'),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'cascade_delete',
+                        child: Text('연관 삭제'),
                       ),
                     ];
                   },

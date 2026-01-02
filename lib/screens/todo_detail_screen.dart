@@ -80,6 +80,7 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
               progress: 0, // 새로운 할 일은 진행률 0
               startDate: currentDate,
               endDate: currentDate, // 각 항목의 시작일과 종료일은 동일
+              className: _title+_startDate.toIso8601String(), // className에 반복 그룹 식별자 저장
             );
             todoBox.put(newTodo.id, newTodo);
           }
@@ -137,7 +138,7 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
               const SizedBox(height: 16),
               // 중요도 선택
               DropdownButtonFormField<Importance>(
-                value: _importance,
+                //value: _importance,
                 decoration: const InputDecoration(
                   labelText: '중요도',
                   border: OutlineInputBorder(),
@@ -180,7 +181,7 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
               // 반복 주기
               if (widget.todo == null) // 새 Todo 추가 시에만 반복 주기 표시
                 DropdownButtonFormField<cycle>(
-                  value: _cycle,
+                  //value: _cycle,
                   decoration: const InputDecoration(
                     labelText: '반복 주기',
                     border: OutlineInputBorder(),

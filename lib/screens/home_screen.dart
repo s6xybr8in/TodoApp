@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+//import 'package:todo/models/daily.dart';
 import 'package:todo/models/todo.dart';
 import 'package:todo/screens/todo_detail_screen.dart';
 import 'package:todo/widgets/todo_list_item.dart';
@@ -16,6 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     // Hive Box를 가져옵니다.
     final Box<Todo> todoBox = Hive.box<Todo>('todos');
+    //final Box<Daily> dailyBox = Hive.box<Daily>('dailies');
 
     return Scaffold(
 
@@ -66,17 +68,6 @@ class _HomeScreenState extends State<HomeScreen> {
               final todo = todos[index];
               return TodoListItem(
                 todo: todo,
-                onCheckboxChanged: (bool? value) {
-                  // 체크박스 상태가 변경되면 Hive에 저장된 객체를 업데이트합니다.
-                  todo.isDone = value ?? false;
-                  if (todo.isDone) {
-                    todo.doneDate = DateTime.now();
-                  } else {
-                    todo.doneDate = null;
-                  }
-                  todo.progress = todo.isDone ? 100 : todo.progress;
-                  todo.save();
-                },
                 onTap: () {
                   // 수정 화면으로 이동
                   Navigator.of(context).push(

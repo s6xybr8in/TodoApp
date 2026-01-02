@@ -8,11 +8,12 @@
 .history
 
 # gemini cli
-/GEMINI.md
+**/GEMINI.md
 
 #token files
 *token.*
-
+# Localization files
+**/android/app/src/main/res/values/strings.xml
 
 # Flutter repo-specific
 /bin/cache/
