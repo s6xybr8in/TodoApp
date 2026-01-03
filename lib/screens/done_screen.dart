@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:todo/models/daily.dart';
+import 'package:todo/models/icalendar.dart';
 import 'package:todo/models/todo.dart';
 import 'package:todo/screens/todo_detail_screen.dart';
 import 'package:todo/widgets/todo_list_item.dart';
@@ -44,6 +45,15 @@ class _DoneScreenState extends State<DoneScreen> {
             ),
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.backup),
+            onPressed: () async {
+              // ICS 파일 생성
+              String icsContent = await generateIcsSchedule();
+              print(icsContent);
+              }
+      )],
       ),
       body: ValueListenableBuilder(
         // 감시 대상을 dailyBox로 변경
@@ -51,19 +61,15 @@ class _DoneScreenState extends State<DoneScreen> {
         builder: (context, Box<Daily> box, _) {
           // dailyBox에서 완료된 Todo 목록을 계산
           List<Todo> doneTodos = [];
+          Daily? dailyForSelectedDay; // Declare dailyForSelectedDay outside try-catch
           if (_selectedDay != null) {
             try {
-              // 선택된 날짜에 해당하는 Daily 객체를 찾음
               final now = DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day);
-              final dailyForSelectedDay = box.values.firstWhere(
+              dailyForSelectedDay = box.values.firstWhere(
                 (daily) => isSameDay(daily.date, now),
               );
-              // 해당 Daily 객체의 content(HiveList)에서 isDone인 Todo만 필터링
-              if (dailyForSelectedDay.isInBox) {
-                doneTodos = dailyForSelectedDay.content!.toList();
-              }
             } catch (e) {
-              // 해당 날짜에 Daily 객체가 없으면 목록은 비어있음
+              // 해당 날짜에 Daily 객체가 없으면 dailyForSelectedDay는 null
             }
           }
 
@@ -133,27 +139,41 @@ class _DoneScreenState extends State<DoneScreen> {
               ),
               const SizedBox(height: 8.0),
               Expanded(
-                child: doneTodos.isEmpty
-                    ? const Center(
-                        child: Text('선택한 날짜에 완료된 투두가 없어요!'),
-                      )
-                    : ListView.builder(
-                        itemCount: doneTodos.length,
-                        itemBuilder: (context, index) {
-                          final todo = doneTodos[index];
-                          return TodoListItem(
-                            todo: todo,
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      TodoDetailScreen(todo: todo),
-                                ),
-                              );
-                            },
+                child: () {
+                  if (dailyForSelectedDay == null || !dailyForSelectedDay.isInBox || dailyForSelectedDay.content == null) {
+                    return const Center(
+                      child: Text('선택한 날짜에 완료된 투두가 없어요!'),
+                    );
+                  }
+
+                  final doneTodos = dailyForSelectedDay.content!
+                      .where((todo) => todo.isDone)
+                      .toList();
+
+                  if (doneTodos.isEmpty) {
+                    return const Center(
+                      child: Text('선택한 날짜에 완료된 투두가 없어요!'),
+                    );
+                  }
+
+                  return ListView.builder(
+                    itemCount: doneTodos.length,
+                    itemBuilder: (context, index) {
+                      final todo = doneTodos[index];
+                      return TodoListItem(
+                        todo: todo,
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  TodoDetailScreen(todo: todo),
+                            ),
                           );
                         },
-                      ),
+                      );
+                    },
+                  );
+                }(),
               ),
             ],
           );

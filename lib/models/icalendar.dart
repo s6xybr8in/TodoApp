@@ -39,19 +39,20 @@ END:VCALENDAR
 */
 
 import 'package:hive/hive.dart';
+import 'package:todo/models/daily.dart';
 import 'package:todo/models/todo.dart';
 
 String head = '''BEGIN:VCALENDAR%0A\
-                  VERSION:2.0%0A\
-                  PRODID:-//My Todo//KR%0A\
-                  CALSCALE:GREGORIAN%0A\
-                  ''';
+VERSION:2.0%0A\
+PRODID:-//My Todo//KR%0A\
+CALSCALE:GREGORIAN%0A\
+''';
 String tail = 'END:VCALENDAR';
 
 String generateIcsTodo(String id, String title, DateTime doneDate) {
   String ics = '''BEGIN:VEVENT%0A\
     UID:$id%0A\
-    DTSTAMP:${doneDate.toUtc().toIso8601String().replaceAll('-', '').replaceAll(':', '').split('.').first}Z%0A\
+    DTSTAMP:${doneDate.toIso8601String().replaceAll('-', '').replaceAll(':', '').split('.').first}Z%0A\
     DTSTART:${doneDate.toIso8601String().split('T').first.replaceAll('-', '')}%0A\
     DTEND:${doneDate.add(Duration(days: 1)).toIso8601String().split('T').first.replaceAll('-', '')}%0A\
     SUMMARY:$title%0A\
@@ -66,11 +67,14 @@ String generateIcsTodo(String id, String title, DateTime doneDate) {
 Future<String> generateIcsSchedule() async{
   String content = '';
   // 모든 완료된 할 일 가져오기
-  var todoBox = Hive.box<Todo>('todos');
-  var completedTodos = todoBox.values.where((todo) => todo.isDone);
-  for (var todo in completedTodos) {
-    content += generateIcsTodo(todo.id, todo.title, todo.doneDate!);
-  }
+  var dailyBox = Hive.box<Daily>('dailies');
+  for (var daily in dailyBox.values) {
+    for(var todo in daily.content!) {
+      final date = daily.date;
+      final utcDate = DateTime.utc(date.year, date.month, date.day);
+        content += generateIcsTodo(todo.id, todo.title, utcDate);
+      }
+    }
 
   return head + content + tail;
 }

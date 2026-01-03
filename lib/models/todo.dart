@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:todo/models/daily.dart';
 
 part 'todo.g.dart';
@@ -55,6 +54,9 @@ class Todo extends HiveObject {
     this.doneDate,
     this.className = '',
   });
+
+
+
   Future<void> markAsDone() async {
     if (isDone) return; // 이미 완료된 경우 중복 실행 방지
     isDone = true;
@@ -75,4 +77,8 @@ class Todo extends HiveObject {
     
     await Daily.markTodoAsUndone(this,oldDoneDate);
   }
+
+  
+
+
 }

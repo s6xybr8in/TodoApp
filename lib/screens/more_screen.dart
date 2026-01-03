@@ -22,13 +22,13 @@ class MoreScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: const Center(
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
 
             Image(
-              image: AssetImage('../../assets/icons/char.png'),
+              image: Image.asset('/icons/char.png').image,
               width: 300,
               height: 300,
             ),
