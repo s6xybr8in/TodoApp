@@ -68,17 +68,42 @@ class _DoneScreenState extends State<DoneScreen> {
           }
 
           // dailyBox를 기준으로 캘린더 이벤트 날짜 목록 생성
-          List<DateTime> events = box.values
-              .where((daily) => daily.isInBox)
-              .map((daily) => daily.date)
-              .toList();
+          final events = <DateTime, List<dynamic>>{};
+          for (final daily in box.values) {
+            // table_calendar는 UTC 기준이므로 키를 UTC 날짜로 변환합니다.
+            final date = DateTime.utc(daily.date.year, daily.date.month, daily.date.day);
+            events[date] = daily.content?.toList() ?? [];
+          }
 
           return Column(
             children: [
               TableCalendar(
                 eventLoader: (day) {
-                  return events.where((event) => isSameDay(event, day)).toList();
+                  return events[day] ?? [];
                 },
+               calendarBuilders: CalendarBuilders(
+                markerBuilder: (context, date, events) {
+                if (events.isNotEmpty) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: events.map((event) {
+                      return Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 1.5),
+                        width: 7,
+                        height: 7,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: const Color.fromARGB(255, 30, 0, 68), // 이벤트 종류에 따라 색상 분기 가능
+                        ),
+                      );
+                    }).toList(),
+                  );
+                }
+                return null;
+                },
+                ),
+
+
                 firstDay: DateTime.utc(2020, 1, 1),
                 lastDay: DateTime.utc(2030, 12, 31),
                 focusedDay: _focusedDay,
