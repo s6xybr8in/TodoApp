@@ -205,9 +205,8 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
                 children: [
                   ElevatedButton.icon(
                     icon: const Icon(Icons.calendar_today),
-                    label: Text(_cycle == cycle.none
-                        ? '시작: ${_startDate.toString().substring(0, 10)}'
-                        : '반복 시작: ${_startDate.toString().substring(0, 10)}'),
+                    label: Text(
+                        '시작: ${_startDate.toString().substring(5, 10)}'),
                     onPressed: () async {
                       final date = await showDatePicker(
                         context: context,
@@ -224,9 +223,8 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
                   ),
                   ElevatedButton.icon(
                     icon: const Icon(Icons.calendar_today),
-                    label: Text(_cycle == cycle.none
-                        ? '종료: ${_endDate.toString().substring(0, 10)}'
-                        : '반복 종료: ${_endDate.toString().substring(0, 10)}'),
+                    label: Text(
+                        '종료: ${_endDate.toString().substring(5, 10)}'),
                     onPressed: () async {
                       final date = await showDatePicker(
                         context: context,
