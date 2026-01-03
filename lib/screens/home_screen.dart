@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 //import 'package:todo/models/daily.dart';
 import 'package:todo/models/todo.dart';
 import 'package:todo/screens/todo_detail_screen.dart';
+import 'package:todo/theme/app_decorations.dart';
 import 'package:todo/widgets/todo_list_item.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -25,17 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Todo App', style: TextStyle(fontWeight: FontWeight.bold)),
         elevation: 0, // for a flatter look
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                Color(0xFF4F46E5), // indigo
-                Color(0xFF7C3AED), // violet
-                Color(0xFF2563EB), // blue
-              ],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
+          decoration: kAppBarDecoration,
         ),
       ),
       // ValueListenableBuilder를 사용하여 Hive Box의 변경사항을 실시간으로 감지합니다.
