@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:todo/debug/debug.dart';
 import 'package:todo/models/daily.dart';
 import 'package:todo/models/icalendar.dart';
 import 'package:todo/models/todo.dart';
@@ -39,7 +40,7 @@ class _DoneScreenState extends State<DoneScreen> {
             onPressed: () async {
               // ICS 파일 생성
               String icsContent = await generateIcsSchedule();
-              print(icsContent);
+              kPrint(icsContent);
               }
       )],
       ),
@@ -63,7 +64,7 @@ class _DoneScreenState extends State<DoneScreen> {
               }
 
               // dailyBox를 기준으로 캘린더 이벤트 날짜 목록 생성
-              final events = <DateTime, List<dynamic>>{};
+              final events = <DateTime, List<Todo>>{};
               for (final daily in dailyBox.values) {
                 // table_calendar는 UTC 기준이므로 키를 UTC 날짜로 변환합니다.
                 final date = DateTime.utc(daily.date.year, daily.date.month, daily.date.day);

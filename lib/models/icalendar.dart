@@ -1,4 +1,6 @@
 
+// ignore_for_file: unnecessary_string_escapes
+
 /*
 "scheduleIcalString=\
 BEGIN:VCALENDAR%0A\
@@ -40,7 +42,6 @@ END:VCALENDAR
 
 import 'package:hive/hive.dart';
 import 'package:todo/models/daily.dart';
-import 'package:todo/models/todo.dart';
 
 String head = '''BEGIN:VCALENDAR%0A\
 VERSION:2.0%0A\

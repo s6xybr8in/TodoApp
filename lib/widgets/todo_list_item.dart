@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo/models/importance.dart';
 import 'package:todo/models/todo.dart';
 import 'package:todo/theme/colors.dart';
 
@@ -40,11 +41,7 @@ class TodoListItem extends StatelessWidget {
                 Checkbox(
                   value: todo.isDone,
                   onChanged: (bool? value) {
-                              if (value == true) {
-                                todo.markAsDone();
-                              } else {
-                                todo.markAsUndone();
-                              }
+                    (value == true) ? todo.markAsDone() : todo.markAsUndone();
                   },
                   activeColor: _getImportanceColor(todo.importance),
                   
@@ -70,6 +67,9 @@ class TodoListItem extends StatelessWidget {
                         // todo.delete_cascade();
                       }
                     }
+                    else if (value == 'toggle_star') {
+                      todo.toggleStar();
+                    }
                   },
                   itemBuilder: (BuildContext context) {
                     return [
@@ -80,6 +80,10 @@ class TodoListItem extends StatelessWidget {
                       const PopupMenuItem<String>(
                         value: 'cascade_delete',
                         child: Text('연관 삭제'),
+                      ),
+                      const PopupMenuItem<String>(
+                        value: 'toggle_star',
+                        child: Text('찜'),
                       ),
                     ];
                   },

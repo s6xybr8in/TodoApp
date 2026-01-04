@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-//import 'package:todo/api/test_naver.dart';
 import 'package:todo/screens/done_screen.dart';
 import 'package:todo/screens/home_screen.dart';
-import 'package:todo/screens/more_screen.dart';
+import 'package:todo/screens/stars_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -17,7 +16,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const DoneScreen(),
-    const MoreScreen(),
+    const StarsScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -41,8 +40,8 @@ class _MainScreenState extends State<MainScreen> {
             label: 'Done',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.more_horiz),
-            label: 'More',
+            icon: Icon(Icons.star),
+            label: 'Stars',
           ),
         ],
         currentIndex: _selectedIndex,

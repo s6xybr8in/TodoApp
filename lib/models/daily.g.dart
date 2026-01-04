@@ -18,7 +18,7 @@ class DailyAdapter extends TypeAdapter<Daily> {
     };
     return Daily(
       date: fields[0] as DateTime,
-    )..content = (fields[1] as HiveList?)!.castHiveList(); // Content가 없다면 daily객체 없애기
+    )..content = (fields[1] as HiveList?)?.castHiveList();
   }
 
   @override

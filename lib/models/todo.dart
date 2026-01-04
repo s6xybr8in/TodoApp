@@ -1,18 +1,11 @@
+import 'package:collection/collection.dart';
 import 'package:hive/hive.dart';
 import 'package:todo/models/daily.dart';
-
+import 'package:todo/models/importance.dart';
+import 'package:todo/models/star.dart';
 part 'todo.g.dart';
 
-// 중요도를 나타내는 열거형
-@HiveType(typeId: 1)
-enum Importance {
-  @HiveField(0)
-  low,
-  @HiveField(1)
-  medium,
-  @HiveField(2)
-  high,
-}
+
 
 @HiveType(typeId: 0)
 class Todo extends HiveObject implements Comparable<Todo> {
@@ -43,6 +36,10 @@ class Todo extends HiveObject implements Comparable<Todo> {
   @HiveField(8)
   String className;
 
+  @HiveField(9)
+  bool isStared;
+
+
   Todo({
     required this.id,
     required this.title,
@@ -53,6 +50,7 @@ class Todo extends HiveObject implements Comparable<Todo> {
     this.isDone = false,
     this.doneDate,
     this.className = '',
+    this.isStared = false,
   });
 
   @override
@@ -88,7 +86,27 @@ class Todo extends HiveObject implements Comparable<Todo> {
     await Daily.markTodoAsUndone(this,oldDoneDate);
   }
 
-  
+  void toggleStar() async{
+    isStared = !isStared;
+    await save();
+    if(isStared){
+      final starBox = Hive.box<Star>('stars');
+      final newStar = Star(
+        id: id,
+        title: title,
+        importance: importance,
+      );
+      starBox.put(newStar.id, newStar);
+      
+    }else{
+      final starBox = Hive.box<Star>('stars');
+      final star = starBox.values.firstWhereOrNull((star) => star.id == id);
+      if(star!=null) {
+        await star.delete();
+        await star.save();
+      }
+    }
 
 
+  }
 }

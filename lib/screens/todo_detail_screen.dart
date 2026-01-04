@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:todo/models/importance.dart';
 import 'package:todo/models/todo.dart';
 
 // cycle 열거형에 대한 표시 이름 확장
-extension CycleExtension on cycle {
+extension CycleExtension on Cycle {
   String get displayName {
     switch (this) {
-      case cycle.none:
+      case Cycle.none:
         return '없음';
-      case cycle.daily:
+      case Cycle.daily:
         return '매일';
-      case cycle.weekly:
+      case Cycle.weekly:
         return '매주';
-      case cycle.monthly:
+      case Cycle.monthly:
         return '매월';
     }
   }
@@ -34,7 +35,7 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
   late int _progress;
   late DateTime _startDate;
   late DateTime _endDate;
-  late cycle _cycle;
+  late Cycle _cycle;
 
   @override
   void initState() {
@@ -47,7 +48,7 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
     initDate = DateTime(initDate.year, initDate.month, initDate.day);
     _startDate = widget.todo?.startDate ?? initDate;
     _endDate = widget.todo?.endDate ?? initDate;
-    _cycle = cycle.none; // _cycle 초기화
+    _cycle = Cycle.none; // _cycle 초기화
   }
 
   void _saveTodo() {
@@ -58,7 +59,7 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
 
       if (widget.todo == null) {
         // 새로운 Todo 추가
-        if (_cycle == cycle.none) {
+        if (_cycle == Cycle.none) {
           final newTodo = Todo(
             id: DateTime.now().millisecondsSinceEpoch.toString(),
             title: _title,
@@ -70,7 +71,7 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
           todoBox.put(newTodo.id, newTodo);
         } else {
           // 반복 Todo 추가
-          final int epoch = _cycle == cycle.daily ? 1 : _cycle == cycle.weekly ? 7 : 30;
+          final int epoch = _cycle == Cycle.daily ? 1 : _cycle == Cycle.weekly ? 7 : 30;
           for(int i = 0; i < _endDate.difference(_startDate).inDays + 1; i+=epoch) {
              DateTime currentDate = _startDate.add(Duration(days: i));
              final newTodo = Todo(
@@ -180,21 +181,21 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
               const SizedBox(height: 16),
               // 반복 주기
               if (widget.todo == null) // 새 Todo 추가 시에만 반복 주기 표시
-                DropdownButtonFormField<cycle>(
+                DropdownButtonFormField<Cycle>(
                   //value: _cycle,
                   decoration: const InputDecoration(
                     labelText: '반복 주기',
                     border: OutlineInputBorder(),
                   ),
-                  items: cycle.values.map((cycle value) {
-                    return DropdownMenuItem<cycle>(
+                  items: Cycle.values.map((Cycle value) {
+                    return DropdownMenuItem<Cycle>(
                       value: value,
                       child: Text(value.displayName),
                     );
                   }).toList(),
                   onChanged: (value) {
                     setState(() {
-                      _cycle = value ?? cycle.none;
+                      _cycle = value ?? Cycle.none;
                     });
                   },
                 ),
@@ -249,4 +250,4 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
   }
 }
 
-enum cycle { none, daily, weekly, monthly }
+enum Cycle { none, daily, weekly, monthly }
