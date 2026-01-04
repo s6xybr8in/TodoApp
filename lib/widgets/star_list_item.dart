@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:todo/models/importance.dart';
 import 'package:todo/models/star.dart';
+import 'package:todo/repositories/star_repository.dart';
 import 'package:todo/theme/colors.dart';
 
 class StarListItem extends StatelessWidget {
   final Star star;
   final VoidCallback onTap;
+  final _starRepository = StarRepository();
 
-  const StarListItem({
+  StarListItem({
     super.key,
     required this.star,
     required this.onTap,
@@ -43,7 +45,7 @@ class StarListItem extends StatelessWidget {
                   color: Colors.amber,
 
                   onPressed: () async{
-                    await star.cascadeTodoDelete();
+                    await _starRepository.cascadeTodoDelete(star);
                   },
                 ),
                 Expanded(

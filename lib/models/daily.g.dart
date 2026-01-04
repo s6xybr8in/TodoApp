@@ -17,7 +17,7 @@ class DailyAdapter extends TypeAdapter<Daily> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return Daily(
-      date: fields[0] as DateTime,
+      id: fields[0] as String,
     )..content = (fields[1] as HiveList?)?.castHiveList();
   }
 
@@ -26,7 +26,7 @@ class DailyAdapter extends TypeAdapter<Daily> {
     writer
       ..writeByte(2)
       ..writeByte(0)
-      ..write(obj.date)
+      ..write(obj.id)
       ..writeByte(1)
       ..write(obj.content);
   }

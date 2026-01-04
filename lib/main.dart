@@ -5,7 +5,6 @@ import 'package:todo/models/star.dart';
 import '/models/daily.dart';
 import '/models/todo.dart';
 import '/screens/main_screen.dart';
-//import 'api/naver_token.dart';
 int selectedIndex = 0;
 
 void main() async {

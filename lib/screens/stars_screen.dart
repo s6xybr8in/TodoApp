@@ -1,14 +1,10 @@
-// stars는 그렇게 많지 않을거로 예상됨
-// 그러면 어떻게 구현하지
-
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:todo/models/star.dart';
-import 'package:todo/models/todo.dart';
+import 'package:todo/repositories/star_repository.dart';
 import 'package:todo/screens/todo_detail_screen.dart';
 import 'package:todo/theme/app_decorations.dart';
 import 'package:todo/widgets/star_list_item.dart';
-import 'package:todo/widgets/todo_list_item.dart';
 
 class StarsScreen extends StatefulWidget {
   const StarsScreen({super.key});
@@ -55,7 +51,7 @@ class _StarsScreenState extends State<StarsScreen> {
                   // 수정 화면으로 이동
                   Navigator.of(context).push(
                     MaterialPageRoute(
-                      builder: (context) => TodoDetailScreen(todo: Star.makeTodo(star)),
+                      builder: (context) => TodoDetailScreen(todo: StarRepository.makeTodo(star)),
                     ),
                   );
                 },

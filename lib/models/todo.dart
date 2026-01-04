@@ -1,8 +1,5 @@
-import 'package:collection/collection.dart';
 import 'package:hive/hive.dart';
-import 'package:todo/models/daily.dart';
 import 'package:todo/models/importance.dart';
-import 'package:todo/models/star.dart';
 part 'todo.g.dart';
 
 
@@ -62,51 +59,5 @@ class Todo extends HiveObject implements Comparable<Todo> {
     }
     // 중요도가 같으면 제목을 기준으로 오름차순으로 비교합니다.
     return title.compareTo(other.title);
-  }
-
-
-  Future<void> markAsDone() async {
-    if (isDone) return; // 이미 완료된 경우 중복 실행 방지
-    isDone = true;
-    progress = 100;
-    doneDate = DateTime.now();
-    await save(); // Todo 객체의 상태를 먼저 저장
-
-    await Daily.markTodoAsDone(this);
-  }
-
-  Future<void> markAsUndone() async {
-    if (!isDone) return; // 이미 미완료인 경우 중복 실행 방지
-    final oldDoneDate = doneDate; // 날짜 정보를 지우기 전에 백업
-    isDone = false;
-    progress = 0; // 진행률 초기화
-    doneDate = null;
-    await save(); // Todo 객체의 상태를 먼저 저장
-    
-    await Daily.markTodoAsUndone(this,oldDoneDate);
-  }
-
-  void toggleStar() async{
-    isStared = !isStared;
-    await save();
-    if(isStared){
-      final starBox = Hive.box<Star>('stars');
-      final newStar = Star(
-        id: id,
-        title: title,
-        importance: importance,
-      );
-      starBox.put(newStar.id, newStar);
-      
-    }else{
-      final starBox = Hive.box<Star>('stars');
-      final star = starBox.values.firstWhereOrNull((star) => star.id == id);
-      if(star!=null) {
-        await star.delete();
-        await star.save();
-      }
-    }
-
-
   }
 }

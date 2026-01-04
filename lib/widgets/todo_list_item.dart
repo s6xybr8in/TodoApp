@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:todo/models/importance.dart';
 import 'package:todo/models/todo.dart';
+import 'package:todo/repositories/todo_repository.dart';
 import 'package:todo/theme/colors.dart';
 
 class TodoListItem extends StatelessWidget {
   final Todo todo;
   final VoidCallback onTap;
+  final TodoRepository _todoRepository = TodoRepository();
 
-  const TodoListItem({
+  TodoListItem({
     super.key,
     required this.todo,
     required this.onTap,
@@ -41,10 +43,11 @@ class TodoListItem extends StatelessWidget {
                 Checkbox(
                   value: todo.isDone,
                   onChanged: (bool? value) {
-                    (value == true) ? todo.markAsDone() : todo.markAsUndone();
+                    (value == true)
+                        ? _todoRepository.markAsDone(todo)
+                        : _todoRepository.markAsUndone(todo);
                   },
                   activeColor: _getImportanceColor(todo.importance),
-                  
                 ),
                 Expanded(
                   child: Text(
@@ -52,8 +55,11 @@ class TodoListItem extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      decoration: todo.isDone ? TextDecoration.lineThrough : null,
-                      color: todo.isDone ? TColors.doneTodoTextColor : TColors.todoTextColor,
+                      decoration:
+                          todo.isDone ? TextDecoration.lineThrough : null,
+                      color: todo.isDone
+                          ? TColors.doneTodoTextColor
+                          : TColors.todoTextColor,
                     ),
                   ),
                 ),
@@ -61,14 +67,12 @@ class TodoListItem extends StatelessWidget {
                   onSelected: (value) {
                     if (value == 'delete') {
                       todo.delete();
-                    }
-                    else if (value == 'cascade_delete') {
-                      if(!todo.className.isEmpty){
+                    } else if (value == 'cascade_delete') {
+                      if (!todo.className.isEmpty) {
                         // todo.delete_cascade();
                       }
-                    }
-                    else if (value == 'toggle_star') {
-                      todo.toggleStar();
+                    } else if (value == 'toggle_star') {
+                      _todoRepository.toggleStar(todo);
                     }
                   },
                   itemBuilder: (BuildContext context) {

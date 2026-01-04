@@ -3,7 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:todo/debug/debug.dart';
 import 'package:todo/models/daily.dart';
-import 'package:todo/models/icalendar.dart';
+import 'package:todo/utils/icalendar.dart';
 import 'package:todo/models/todo.dart';
 import 'package:todo/widgets/done/done_calendar.dart';
 import 'package:todo/widgets/done/done_todo_list.dart';
