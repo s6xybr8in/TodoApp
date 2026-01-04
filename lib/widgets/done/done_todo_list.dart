@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:todo/models/daily.dart';
-import 'package:todo/models/todo.dart';
 import 'package:todo/screens/todo_detail_screen.dart';
 import 'package:todo/widgets/todo_list_item.dart';
 
@@ -23,13 +22,7 @@ class DoneTodoList extends StatelessWidget {
     }
 
     final doneTodos =
-        dailyForSelectedDay!.content!.where((todo) => todo.isDone).toList();
-
-    if (doneTodos.isEmpty) {
-      return const Center(
-        child: Text('선택한 날짜에 완료된 투두가 없어요!'),
-      );
-    }
+        dailyForSelectedDay!.content!.toList();
 
     return ListView.builder(
       itemCount: doneTodos.length,

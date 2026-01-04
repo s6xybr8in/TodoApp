@@ -1,5 +1,6 @@
 import 'package:hive/hive.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:todo/debug/debug.dart';
 import 'package:todo/models/todo.dart';
 
 part 'daily.g.dart';
@@ -43,7 +44,7 @@ class Daily extends HiveObject {
       dailyForDate.content!.add(todo);
       await dailyForDate.save(); // HiveList 변경사항을 저장
     }
-    print('dailyBox length: ${dailyBox.length}');
+    kPrint('dailyBox length: ${dailyBox.length}');
   }
 
   /// Todo를 미완료 상태로 되돌리고 Daily에서 제거합니다.

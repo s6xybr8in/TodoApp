@@ -15,7 +15,7 @@ enum Importance {
 }
 
 @HiveType(typeId: 0)
-class Todo extends HiveObject {
+class Todo extends HiveObject implements Comparable<Todo> {
   @HiveField(0)
   final String id;
 
@@ -55,6 +55,16 @@ class Todo extends HiveObject {
     this.className = '',
   });
 
+  @override
+  int compareTo(Todo other) {
+    // 중요도를 기준으로 비교합니다. (high > medium > low)
+    final importanceCompare = other.importance.index.compareTo(importance.index);
+    if (importanceCompare != 0) {
+      return importanceCompare;
+    }
+    // 중요도가 같으면 제목을 기준으로 오름차순으로 비교합니다.
+    return title.compareTo(other.title);
+  }
 
 
   Future<void> markAsDone() async {

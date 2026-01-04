@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-//import 'package:todo/models/daily.dart';
 import 'package:todo/models/todo.dart';
 import 'package:todo/screens/todo_detail_screen.dart';
 import 'package:todo/theme/app_decorations.dart';
@@ -18,7 +17,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     // Hive Box를 가져옵니다.
     final Box<Todo> todoBox = Hive.box<Todo>('todos');
-    //final Box<Daily> dailyBox = Hive.box<Daily>('dailies');
 
     return Scaffold(
 
@@ -35,17 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
         builder: (context, Box<Todo> box, _) {
           // Hive Box에서 isDone이 false인 Todo 목록을 가져옵니다.
           final todos = box.values.where((todo) => !todo.isDone).toList().cast<Todo>();
-
-          // 중요도(내림차순), 그다음 제목(오름차순)으로 목록을 정렬합니다.
-          todos.sort((a, b) {
-            // 중요도를 기준으로 비교합니다. (high > medium > low)
-            final importanceCompare = b.importance.index.compareTo(a.importance.index);
-            if (importanceCompare != 0) {
-              return importanceCompare;
-            }
-            // 중요도가 같으면 제목을 기준으로 오름차순으로 비교합니다.
-            return a.title.compareTo(b.title);
-          });
+          todos.sort();
 
           if (todos.isEmpty) {
             return const Center(

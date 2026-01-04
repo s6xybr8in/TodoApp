@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:todo/theme/colors.dart';
 
 class DoneCalendar extends StatelessWidget {
   final Map<DateTime, List<dynamic>> events;
@@ -33,7 +34,7 @@ class DoneCalendar extends StatelessWidget {
                   height: 7,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: const Color.fromARGB(255, 30, 0, 68),
+                    color: TColors.calendarMarkerColor,
                   ),
                 );
               }).toList(),
@@ -51,11 +52,11 @@ class DoneCalendar extends StatelessWidget {
       onDaySelected: onDaySelected,
       calendarStyle: const CalendarStyle(
         todayDecoration: BoxDecoration(
-          color: Color(0xFF7C3AED),
+          color: TColors.calendarTodayDecoration,
           shape: BoxShape.circle,
         ),
         selectedDecoration: BoxDecoration(
-          color: Color(0xFF4F46E5),
+          color: TColors.calendarSelectedDecoration,
           shape: BoxShape.circle,
         ),
       ),

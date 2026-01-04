@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:todo/models/todo.dart';
+import 'package:todo/theme/colors.dart';
 
 class TodoListItem extends StatelessWidget {
   final Todo todo;
@@ -19,12 +20,12 @@ class TodoListItem extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: TColors.backgroundColor,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: TColors.borderColor),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey,
+              color: TColors.shadowColor,
               spreadRadius: 1,
               blurRadius: 5,
               offset: const Offset(0, 2),
@@ -55,7 +56,7 @@ class TodoListItem extends StatelessWidget {
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                       decoration: todo.isDone ? TextDecoration.lineThrough : null,
-                      color: todo.isDone ? Colors.grey : Colors.black87,
+                      color: todo.isDone ? TColors.doneTodoTextColor : TColors.todoTextColor,
                     ),
                   ),
                 ),
@@ -91,7 +92,7 @@ class TodoListItem extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: LinearProgressIndicator(
                   value: todo.progress / 100,
-                  backgroundColor: Colors.grey[200],
+                  backgroundColor: TColors.progressIndicatorBackgroundColor,
                   valueColor: AlwaysStoppedAnimation<Color>(
                     _getImportanceColor(todo.importance),
                   ),
@@ -105,7 +106,7 @@ class TodoListItem extends StatelessWidget {
                 children: [
                   Chip(
                     label: Text(
-                      "${todo.importance.name.toUpperCase()}",
+                      todo.importance.name.toUpperCase(),
                       style: TextStyle(
                         fontSize: 12,
                         color: _getImportanceColor(todo.importance),
@@ -119,7 +120,7 @@ class TodoListItem extends StatelessWidget {
                   const Spacer(),
                   Text(
                     '${todo.startDate.toString().substring(5, 10)} ~ ${todo.endDate.toString().substring(5, 10)}',
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    style: const TextStyle(fontSize: 12, color: TColors.dateColor),
                   ),
                 ],
               ),
@@ -133,11 +134,11 @@ class TodoListItem extends StatelessWidget {
   Color _getImportanceColor(Importance importance) {
     switch (importance) {
       case Importance.high:
-        return const Color(0xFFE53935); // Material Red
+        return TColors.highImportanceColor;
       case Importance.medium:
-        return const Color(0xFF7C3AED); // Theme Secondary
+        return TColors.mediumImportanceColor;
       case Importance.low:
-        return const Color(0xFF42A5F5); // Light Blue
+        return TColors.lowImportanceColor;
     }
   }
 }
