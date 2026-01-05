@@ -33,7 +33,7 @@ class DoneTodoList extends StatelessWidget {
           onTap: () {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => TodoDetailScreen(todo: todo),
+                builder: (context) => TodoDetailScreen(todo: todo, isNew: false),
               ),
             );
           },

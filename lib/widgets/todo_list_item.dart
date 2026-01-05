@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:todo/locator.dart';
 import 'package:todo/models/importance.dart';
 import 'package:todo/models/todo.dart';
 import 'package:todo/repositories/todo_repository.dart';
@@ -7,7 +8,7 @@ import 'package:todo/theme/colors.dart';
 class TodoListItem extends StatelessWidget {
   final Todo todo;
   final VoidCallback onTap;
-  final TodoRepository _todoRepository = TodoRepository();
+  final TodoRepository _todoRepository = locator<TodoRepository>();
 
   TodoListItem({
     super.key,
@@ -66,9 +67,9 @@ class TodoListItem extends StatelessWidget {
                 PopupMenuButton<String>(
                   onSelected: (value) {
                     if (value == 'delete') {
-                      todo.delete();
+                      _todoRepository.deleteTodo(todo);
                     } else if (value == 'cascade_delete') {
-                      if (!todo.className.isEmpty) {
+                      if (!todo.repetitionId.isEmpty) {
                         // todo.delete_cascade();
                       }
                     } else if (value == 'toggle_star') {

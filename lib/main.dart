@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:todo/locator.dart';
 import 'package:todo/models/importance.dart';
 import 'package:todo/models/star.dart';
 import '/models/daily.dart';
@@ -12,6 +13,7 @@ void main() async {
   await Hive.initFlutter();
 
   // Hive 어댑터를 등록합니다.
+
   Hive.registerAdapter(TodoAdapter());
   Hive.registerAdapter(ImportanceAdapter());
   Hive.registerAdapter(DailyAdapter());
@@ -21,6 +23,9 @@ void main() async {
   await Hive.openBox<Todo>('todos');
   await Hive.openBox<Daily>('dailies'); 
   await Hive.openBox<Star>('stars');
+
+  setupLocator();
+
   runApp(const MyApp());
 }
 

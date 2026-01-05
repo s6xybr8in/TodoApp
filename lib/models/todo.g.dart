@@ -25,7 +25,7 @@ class TodoAdapter extends TypeAdapter<Todo> {
       endDate: fields[5] as DateTime,
       isDone: fields[6] as bool,
       doneDate: fields[7] as DateTime?,
-      className: fields[8] as String,
+      repetitionId: fields[8] as String,
       isStared: fields[9] as bool,
     );
   }
@@ -51,7 +51,7 @@ class TodoAdapter extends TypeAdapter<Todo> {
       ..writeByte(7)
       ..write(obj.doneDate)
       ..writeByte(8)
-      ..write(obj.className)
+      ..write(obj.repetitionId)
       ..writeByte(9)
       ..write(obj.isStared);
   }

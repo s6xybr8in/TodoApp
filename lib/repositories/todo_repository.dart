@@ -1,11 +1,80 @@
-import 'package:collection/collection.dart';
 import 'package:hive/hive.dart';
+import 'package:todo/models/importance.dart';
 import 'package:todo/models/star.dart';
 import 'package:todo/models/todo.dart';
 import 'package:todo/repositories/daily_repository.dart';
+import 'package:uuid/uuid.dart';
 
 class TodoRepository {
-  final DailyRepository _dailyRepository = DailyRepository();
+  final DailyRepository _dailyRepository;
+  final Box<Todo> _todoBox = Hive.box<Todo>('todos');
+  final Uuid uid = Uuid();
+  // 생성자를 통해 DailyRepository를 주입받습니다.
+  TodoRepository(this._dailyRepository);
+
+  Todo makeTodo(String title, Importance importance, {DateTime? startDate, DateTime? endDate}) {
+    return Todo(
+          id: uid.v4(),
+          title: title,
+          importance: importance,
+          startDate: startDate ?? DateTime.now(),
+          endDate: endDate ?? DateTime.now(),
+        );
+  }
+  Future<void> saveOrUpdateTodo({
+    required String title,
+    required Importance importance,
+    required int progress,
+    required DateTime startDate,
+    required DateTime endDate,
+    required bool isRepetitive,
+    required int repetitionDays,
+    Todo? existingTodo,
+  }) async {
+    if (existingTodo == null) {
+      // 새로운 Todo 추가
+      if (!isRepetitive || repetitionDays <= 0) {
+        // 단일 Todo
+        final newTodo = Todo(
+          id: uid.v4(),
+          title: title,
+          importance: importance,
+          progress: progress,
+          startDate: startDate,
+          endDate: endDate,
+        );
+        await _todoBox.put(newTodo.id, newTodo);
+      } else {
+        // 반복 Todo
+        for (int i = 0; i <= endDate.difference(startDate).inDays; i += repetitionDays) {
+          DateTime currentDate = startDate.add(Duration(days: i));
+          String repetitionId = uid.v4(); // 반복 그룹 ID 생성
+          final newTodo = Todo(
+            id: uid.v4(),
+            title: title,
+            importance: importance,
+            progress: 0,
+            startDate: currentDate,
+            endDate: currentDate,
+            repetitionId: repetitionId, // 반복 그룹 ID
+          );
+          await _todoBox.put(newTodo.id, newTodo);
+        }
+      }
+    } else {
+      // 기존 Todo 수정 (반복 수정은 지원하지 않음)
+      existingTodo.title = title;
+      existingTodo.importance = importance;
+      existingTodo.progress = progress;
+      existingTodo.startDate = startDate;
+      existingTodo.endDate = endDate;
+      await existingTodo.save();
+    }
+  }
+
+  Future<void> deleteTodo(Todo todo) async {
+    await todo.delete();
+  }
 
   Future<void> markAsDone(Todo todo) async {
     if (todo.isDone) return; // 이미 완료된 경우 중복 실행 방지
@@ -31,17 +100,13 @@ class TodoRepository {
   void toggleStar(Todo todo) async {
     todo.isStared = !todo.isStared;
     await todo.save();
+
+    final starBox = Hive.box<Star>('stars');
     if (todo.isStared) {
-      final starBox = Hive.box<Star>('stars');
-      final newStar = Star(
-        id: todo.id,
-        title: todo.title,
-        importance: todo.importance,
-      );
+      final newStar = Star(id: todo.id);
       starBox.put(newStar.id, newStar);
     } else {
-      final starBox = Hive.box<Star>('stars');
-      final star = starBox.values.firstWhereOrNull((star) => star.id == todo.id);
+      final star = starBox.get(todo.id);
       if (star != null) {
         await star.delete();
       }

@@ -1,14 +1,16 @@
- import 'package:collection/collection.dart';
+import 'package:collection/collection.dart';
 import 'package:hive/hive.dart';
+import 'package:todo/models/importance.dart';
 import 'package:todo/models/star.dart';
 import 'package:todo/models/todo.dart';
+import 'package:uuid/uuid.dart';
 
 class StarRepository {
   final Box<Star> starBox = Hive.box<Star>('stars');
-  
+  final Uuid uid = Uuid();
   List<Star> getAllStars() {
     final stars = starBox.values.toList();
-    stars.sort();
+    // stars.sort(); // Sorting is no longer needed here
     return stars;
   }
 
@@ -23,10 +25,9 @@ class StarRepository {
     }
   }
 
-
   Future<void> cascadeTodoDelete(Star star) async{
     final box = Hive.box<Todo>('todos');
-    final todo = box.values.firstWhereOrNull((todo) => todo.id == star.id);
+    final todo = box.get(star.id); // Use get for efficient lookup
     if(todo != null){
       todo.isStared = false;
       await todo.save();
@@ -35,14 +36,14 @@ class StarRepository {
     return star.delete();
   }
 
-  static Todo makeTodo(Star star) {
+  Todo makeTodo(String title, Importance importance) {
     return Todo(
-      id: star.id,
-      title: star.title,
-      importance: star.importance,
-      startDate: DateTime.now(),
-      endDate: DateTime.now(),
-    );
+          id: uid.v4(),
+          title: title,
+          importance: importance,
+          startDate: DateTime.now(),
+          endDate: DateTime.now(),
+        );
   }
 }
 

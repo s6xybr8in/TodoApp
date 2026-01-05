@@ -18,21 +18,15 @@ class StarAdapter extends TypeAdapter<Star> {
     };
     return Star(
       id: fields[0] as String,
-      title: fields[1] as String,
-      importance: fields[2] as Importance,
     );
   }
 
   @override
   void write(BinaryWriter writer, Star obj) {
     writer
-      ..writeByte(3)
-      ..writeByte(0)
-      ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.title)
-      ..writeByte(2)
-      ..write(obj.importance);
+      ..writeByte(0)
+      ..write(obj.id);
   }
 
   @override

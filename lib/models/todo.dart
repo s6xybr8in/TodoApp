@@ -31,7 +31,7 @@ class Todo extends HiveObject implements Comparable<Todo> {
   DateTime? doneDate;
 
   @HiveField(8)
-  String className;
+  String repetitionId;
 
   @HiveField(9)
   bool isStared;
@@ -46,9 +46,12 @@ class Todo extends HiveObject implements Comparable<Todo> {
     required this.endDate,
     this.isDone = false,
     this.doneDate,
-    this.className = '',
+    this.repetitionId = '',
     this.isStared = false,
   });
+
+  
+
 
   @override
   int compareTo(Todo other) {

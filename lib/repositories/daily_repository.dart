@@ -9,6 +9,22 @@ String formatDateKey(DateTime date) => DateFormat('y-MM-dd').format(date);
 class DailyRepository {
   /// Todo를 완료 상태로 표시하고 오늘 날짜의 Daily에 추가합니다.
   /// Daily가 없으면 새로 생성합니다.
+  // 
+  final Box<Daily> dailyBox = Hive.box<Daily>('dailies');
+  
+  Future<void> save(Daily daily) async{
+    await dailyBox.put(daily.id, daily);
+  }
+
+  Future<void> getDailyByDate(DateTime date) async {
+    final dailyBox = Hive.box<Daily>('dailies');
+    final dateKey = formatDateKey(date);
+  }
+
+  Box<Daily> getBox() {
+    return dailyBox;
+  }
+  
   Future<void> markTodoAsDone(Todo todo) async {
     final dailyBox = Hive.box<Daily>('dailies');
     final dateKey = formatDateKey(todo.doneDate!);

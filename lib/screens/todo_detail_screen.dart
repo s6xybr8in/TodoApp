@@ -1,41 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:todo/locator.dart';
 import 'package:todo/models/importance.dart';
 import 'package:todo/models/todo.dart';
+import 'package:todo/repositories/todo_repository.dart';
 
-// cycle 열거형에 대한 표시 이름 확장
-extension CycleExtension on Cycle {
-  String get displayName {
-    switch (this) {
-      case Cycle.none:
-        return '없음';
-      case Cycle.daily:
-        return '매일';
-      case Cycle.weekly:
-        return '매주';
-      case Cycle.monthly:
-        return '매월';
-    }
-  }
-}
 
 class TodoDetailScreen extends StatefulWidget {
-  final Todo? todo; // 수정할 Todo 항목. 새 항목 추가 시에는 null.
-
-  const TodoDetailScreen({super.key, this.todo});
+  final Todo todo; // 수정할 Todo 항목. 새 항목 추가 시에는 null.
+  final bool isNew;
+  const TodoDetailScreen({super.key, required this.todo, required this.isNew});
 
   @override
   State<TodoDetailScreen> createState() => _TodoDetailScreenState();
 }
 
 class _TodoDetailScreenState extends State<TodoDetailScreen> {
+  final _todoRepository = locator<TodoRepository>();
   final _formKey = GlobalKey<FormState>();
   late String _title;
   late Importance _importance;
   late int _progress;
   late DateTime _startDate;
   late DateTime _endDate;
-  late Cycle _cycle;
+  late int _repetitionDays;
+  late bool _isRepetitive;
 
   @override
   void initState() {
@@ -48,56 +36,28 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
     initDate = DateTime(initDate.year, initDate.month, initDate.day);
     _startDate = widget.todo?.startDate ?? initDate;
     _endDate = widget.todo?.endDate ?? initDate;
-    _cycle = Cycle.none; // _cycle 초기화
+    _repetitionDays = 0;
+    _isRepetitive = false;
   }
 
-  void _saveTodo() {
+  void _saveTodo() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      final todoBox = Hive.box<Todo>('todos');
+      await _todoRepository.saveOrUpdateTodo(
+        title: _title,
+        importance: _importance,
+        progress: _progress,
+        startDate: _startDate,
+        endDate: _endDate,
+        isRepetitive: _isRepetitive,
+        repetitionDays: _repetitionDays,
+        existingTodo: widget.todo,
+      );
 
-      if (widget.todo == null) {
-        // 새로운 Todo 추가
-        if (_cycle == Cycle.none) {
-          final newTodo = Todo(
-            id: DateTime.now().millisecondsSinceEpoch.toString(),
-            title: _title,
-            importance: _importance,
-            progress: _progress,
-            startDate: _startDate,
-            endDate: _endDate,
-          );
-          todoBox.put(newTodo.id, newTodo);
-        } else {
-          // 반복 Todo 추가
-          final int epoch = _cycle == Cycle.daily ? 1 : _cycle == Cycle.weekly ? 7 : 30;
-          for(int i = 0; i < _endDate.difference(_startDate).inDays + 1; i+=epoch) {
-             DateTime currentDate = _startDate.add(Duration(days: i));
-             final newTodo = Todo(
-              id: "${DateTime.now().millisecondsSinceEpoch}_$i", // 고유 ID 생성
-              title: _title,
-              importance: _importance,
-              progress: 0, // 새로운 할 일은 진행률 0
-              startDate: currentDate,
-              endDate: currentDate, // 각 항목의 시작일과 종료일은 동일
-              className: _title+_startDate.toIso8601String(), // className에 반복 그룹 식별자 저장
-            );
-            todoBox.put(newTodo.id, newTodo);
-          }
-    
-        }
-      } else {
-        // 기존 Todo 수정 (반복 수정은 지원하지 않음)
-        widget.todo!.title = _title;
-        widget.todo!.importance = _importance;
-        widget.todo!.progress = _progress;
-        widget.todo!.startDate = _startDate;
-        widget.todo!.endDate = _endDate;
-        widget.todo!.save();
+      if (mounted) {
+        Navigator.of(context).pop();
       }
-
-      Navigator.of(context).pop();
     }
   }
 
@@ -105,7 +65,7 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.todo == null ? '새 Todo 추가' : 'Todo 수정'),
+        title: Text(widget.isNew ? '새 Todo 추가' : 'Todo 수정'),
         actions: [
           IconButton(
             icon: const Icon(Icons.check),
@@ -180,26 +140,53 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
               ),
               const SizedBox(height: 16),
               // 반복 주기
-              if (widget.todo == null) // 새 Todo 추가 시에만 반복 주기 표시
-                DropdownButtonFormField<Cycle>(
-                  //value: _cycle,
-                  decoration: const InputDecoration(
-                    labelText: '반복 주기',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: Cycle.values.map((Cycle value) {
-                    return DropdownMenuItem<Cycle>(
-                      value: value,
-                      child: Text(value.displayName),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      _cycle = value ?? Cycle.none;
-                    });
-                  },
+              if (widget.isNew) // 새 Todo 추가 시에만 반복 주기 표시
+                Column(
+                  children: [
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: _isRepetitive,
+                          onChanged: (value) {
+                            setState(() {
+                              _isRepetitive = value!;
+                              if (_isRepetitive && _repetitionDays == 0) {
+                                _repetitionDays = 1; // Default to 1 day if repetition is enabled
+                              } else if (!_isRepetitive) {
+                                _repetitionDays = 0; // Reset if repetition is disabled
+                              }
+                            });
+                          },
+                        ),
+                        const Text('반복 설정'),
+                      ],
+                    ),
+                    if (_isRepetitive)
+                      TextFormField(
+                        initialValue: _repetitionDays.toString(),
+                        decoration: const InputDecoration(
+                          labelText: '반복 간격 (일)',
+                          border: OutlineInputBorder(),
+                        ),
+                        keyboardType: TextInputType.number,
+                        validator: (value) {
+                          if (_isRepetitive && (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value) <= 0)) {
+                            return '유효한 반복 간격(일)을 입력해주세요.';
+                          }
+                          return null;
+                        },
+                        onSaved: (value) {
+                          _repetitionDays = int.tryParse(value!) ?? 0;
+                        },
+                        onChanged: (value) {
+                          setState(() {
+                            _repetitionDays = int.tryParse(value) ?? 0;
+                          });
+                        },
+                      ),
+                  ],
                 ),
-              if (widget.todo == null) const SizedBox(height: 16),
+              if (widget.isNew) const SizedBox(height: 16),
               // 날짜 선택 (간단한 버튼으로 구현)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -250,4 +237,4 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
   }
 }
 
-enum Cycle { none, daily, weekly, monthly }
+
