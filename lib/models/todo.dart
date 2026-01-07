@@ -50,9 +50,6 @@ class Todo extends HiveObject implements Comparable<Todo> {
     this.isStared = false,
   });
 
-  
-
-
   @override
   int compareTo(Todo other) {
     // 중요도를 기준으로 비교합니다. (high > medium > low)

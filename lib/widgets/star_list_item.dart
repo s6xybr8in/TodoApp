@@ -1,30 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:todo/locator.dart';
+import 'package:provider/provider.dart';
 import 'package:todo/models/importance.dart';
 import 'package:todo/models/todo.dart';
-import 'package:todo/repositories/star_repository.dart';
-import 'package:todo/repositories/todo_repository.dart';
+import 'package:todo/providers/star_provider.dart';
+import 'package:todo/providers/todo_provider.dart';
 import 'package:todo/screens/todo_detail_screen.dart';
 import 'package:todo/theme/colors.dart';
 
-class TodoViewerListItem extends StatelessWidget {
+class StarListItem extends StatelessWidget {
   final Todo todo;
-  final TodoRepository _todoRepository = locator<TodoRepository>();
-  final StarRepository _starRepository = locator<StarRepository>();
 
-  TodoViewerListItem({
+  const StarListItem({
     super.key,
     required this.todo,
   });
 
   @override
   Widget build(BuildContext context) {
+    final TodoProvider todoProvider = context.watch<TodoProvider>();
+    final StarProvider starProvider = context.watch<StarProvider>();
+    
     return GestureDetector(
       onTap: () {
         // Navigate to detail screen to create a new Todo
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => TodoDetailScreen(todo: _starRepository.makeTodo(todo.title, todo.importance), isNew: true),
+            builder: (context) => TodoDetailScreen(todoProvider: todoProvider, title: todo.title, importance: todo.importance),
           ),
         );
       },
@@ -37,7 +38,7 @@ class TodoViewerListItem extends StatelessWidget {
           border: Border.all(color: TColors.borderColor),
           boxShadow: [
             BoxShadow(
-              color: TColors.shadowColor.withOpacity(0.5),
+              color: TColors.shadowColor,
               spreadRadius: 1,
               blurRadius: 3,
               offset: const Offset(0, 1),
@@ -51,8 +52,9 @@ class TodoViewerListItem extends StatelessWidget {
                 todo.isStared ? Icons.star : Icons.star_border,
                 color: todo.isStared ? Colors.amber : Colors.grey,
               ),
-              onPressed: () {
-                _todoRepository.toggleStar(todo);
+              onPressed: () async{
+                await starProvider.deletebyID(todo.id);
+                context.read<TodoProvider>().toggleStar(todo);
               },
             ),
             Expanded(

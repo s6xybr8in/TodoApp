@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:todo/locator.dart';
 import 'package:todo/models/importance.dart';
 import 'package:todo/models/todo.dart';
-import 'package:todo/repositories/todo_repository.dart';
+import 'package:todo/providers/todo_provider.dart';
 
 
 class TodoDetailScreen extends StatefulWidget {
-  final Todo todo; // 수정할 Todo 항목. 새 항목 추가 시에는 null.
-  final bool isNew;
-  const TodoDetailScreen({super.key, required this.todo, required this.isNew});
+  final Todo? todo; // 수정할 Todo 항목. 새 항목 추가 시에는 null.
+  final TodoProvider todoProvider;  
+  final String? title;
+  final Importance? importance;
+  const TodoDetailScreen({super.key, this.todo, required this.todoProvider, this.title, this.importance});
 
   @override
   State<TodoDetailScreen> createState() => _TodoDetailScreenState();
 }
 
 class _TodoDetailScreenState extends State<TodoDetailScreen> {
-  final _todoRepository = locator<TodoRepository>();
   final _formKey = GlobalKey<FormState>();
   late String _title;
   late Importance _importance;
@@ -29,8 +29,8 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
   void initState() {
     super.initState();
     // 기존 Todo 데이터가 있으면 해당 데이터로 초기화, 없으면 기본값으로 초기화
-    _title = widget.todo?.title ?? '';
-    _importance = widget.todo?.importance ?? Importance.medium;
+    _title = widget.title ?? widget.todo?.title ?? ''; 
+    _importance = widget.importance ?? widget.todo?.importance ?? Importance.medium;
     _progress = widget.todo?.progress ?? 0;
     DateTime initDate = DateTime.now();
     initDate = DateTime(initDate.year, initDate.month, initDate.day);
@@ -44,16 +44,8 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
-      await _todoRepository.saveOrUpdateTodo(
-        title: _title,
-        importance: _importance,
-        progress: _progress,
-        startDate: _startDate,
-        endDate: _endDate,
-        isRepetitive: _isRepetitive,
-        repetitionDays: _repetitionDays,
-        existingTodo: widget.todo,
-      );
+      final newTodo = widget.todoProvider.makeTodo(_title, _importance);
+      await widget.todoProvider.addTodo(newTodo);
 
       if (mounted) {
         Navigator.of(context).pop();
@@ -65,7 +57,7 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.isNew ? '새 Todo 추가' : 'Todo 수정'),
+        title: Text(widget.todo == null ? '새 Todo 추가' : 'Todo 수정'),
         actions: [
           IconButton(
             icon: const Icon(Icons.check),
@@ -100,6 +92,7 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
               // 중요도 선택
               DropdownButtonFormField<Importance>(
                 //value: _importance,
+                initialValue: _importance,
                 decoration: const InputDecoration(
                   labelText: '중요도',
                   border: OutlineInputBorder(),
@@ -140,7 +133,7 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
               ),
               const SizedBox(height: 16),
               // 반복 주기
-              if (widget.isNew) // 새 Todo 추가 시에만 반복 주기 표시
+              if (widget.todo == null) // 새 Todo 추가 시에만 반복 주기 표시
                 Column(
                   children: [
                     Row(
@@ -186,7 +179,7 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
                       ),
                   ],
                 ),
-              if (widget.isNew) const SizedBox(height: 16),
+              if (widget.todo != null) const SizedBox(height: 16),
               // 날짜 선택 (간단한 버튼으로 구현)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,

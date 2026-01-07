@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:todo/locator.dart';
+import 'package:provider/provider.dart';
 import 'package:todo/models/importance.dart';
 import 'package:todo/models/star.dart';
-import '/models/daily.dart';
+import 'package:todo/providers/star_provider.dart';
+import 'package:todo/providers/todo_provider.dart';
+import 'package:todo/repositories/star_repository.dart';
+import 'package:todo/repositories/todo_repository.dart';
 import '/models/todo.dart';
 import '/screens/main_screen.dart';
 int selectedIndex = 0;
@@ -16,17 +19,23 @@ void main() async {
 
   Hive.registerAdapter(TodoAdapter());
   Hive.registerAdapter(ImportanceAdapter());
-  Hive.registerAdapter(DailyAdapter());
   Hive.registerAdapter(StarAdapter());
 
   // 'todos'라는 이름의 Box를 엽니다.
   await Hive.openBox<Todo>('todos');
-  await Hive.openBox<Daily>('dailies'); 
   await Hive.openBox<Star>('stars');
 
-  setupLocator();
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(providers: 
+      [
+        Provider (create: (_)=> TodoRepository()),
+        Provider (create: (_)=> StarRepository()),
+        ChangeNotifierProvider(create: (context) => TodoProvider(context.read<TodoRepository>())),
+        ChangeNotifierProvider(create: (context) => StarProvider(context.read<StarRepository>())),
+      ]
+    ,child : const MyApp())
+    );
 }
 
 class MyApp extends StatelessWidget {

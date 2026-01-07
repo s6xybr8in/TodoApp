@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:todo/locator.dart';
+import 'package:provider/provider.dart';
 import 'package:todo/models/importance.dart';
 import 'package:todo/models/todo.dart';
-import 'package:todo/repositories/todo_repository.dart';
+import 'package:todo/providers/star_provider.dart';
+import 'package:todo/providers/todo_provider.dart';
 import 'package:todo/theme/colors.dart';
 
 class TodoListItem extends StatelessWidget {
   final Todo todo;
   final VoidCallback onTap;
-  final TodoRepository _todoRepository = locator<TodoRepository>();
 
-  TodoListItem({
+  const TodoListItem({
     super.key,
     required this.todo,
     required this.onTap,
@@ -18,6 +18,7 @@ class TodoListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TodoProvider todoProvider = context.watch<TodoProvider>();
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -43,10 +44,8 @@ class TodoListItem extends StatelessWidget {
               children: [
                 Checkbox(
                   value: todo.isDone,
-                  onChanged: (bool? value) {
-                    (value == true)
-                        ? _todoRepository.markAsDone(todo)
-                        : _todoRepository.markAsUndone(todo);
+                  onChanged: (_) async {
+                    await todoProvider.toggleDone(todo);
                   },
                   activeColor: _getImportanceColor(todo.importance),
                 ),
@@ -65,15 +64,20 @@ class TodoListItem extends StatelessWidget {
                   ),
                 ),
                 PopupMenuButton<String>(
-                  onSelected: (value) {
+                  onSelected: (value) async{
                     if (value == 'delete') {
-                      _todoRepository.deleteTodo(todo);
+                      await todoProvider.deleteTodo(todo);
                     } else if (value == 'cascade_delete') {
                       if (!todo.repetitionId.isEmpty) {
                         // todo.delete_cascade();
                       }
-                    } else if (value == 'toggle_star') {
-                      _todoRepository.toggleStar(todo);
+                    } else if (value == 'toggle_star'){
+                      await todoProvider.toggleStar(todo);
+                      if (todo.isStared) {
+                        context.read<StarProvider>().addStar(todo.id);
+                      }else{
+                        context.read<StarProvider>().deletebyID(todo.id);
+                      }
                     }
                   },
                   itemBuilder: (BuildContext context) {

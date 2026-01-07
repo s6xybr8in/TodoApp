@@ -40,8 +40,6 @@ END:VEVENT
 END:VCALENDAR
 */
 
-import 'package:hive/hive.dart';
-import 'package:todo/models/daily.dart';
 
 String head = '''BEGIN:VCALENDAR%0A\
 VERSION:2.0%0A\
@@ -64,7 +62,7 @@ String generateIcsTodo(String id, String title, DateTime doneDate) {
   }
   // %0A가 줄바꿈을 의미합니다.
 
-
+/*
 Future<String> generateIcsSchedule() async{
   String content = '';
   // 모든 완료된 할 일 가져오기
@@ -79,3 +77,4 @@ Future<String> generateIcsSchedule() async{
 
   return head + content + tail;
 }
+*/

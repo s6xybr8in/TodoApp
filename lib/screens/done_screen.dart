@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hive_flutter/hive_flutter.dart';
-import 'package:table_calendar/table_calendar.dart';
-import 'package:todo/debug/debug.dart';
-import 'package:todo/models/daily.dart';
+import 'package:provider/provider.dart';
+import 'package:todo/providers/todo_provider.dart';
 import 'package:todo/utils/icalendar.dart';
 import 'package:todo/models/todo.dart';
 import 'package:todo/widgets/done/done_calendar.dart';
@@ -28,6 +26,15 @@ class _DoneScreenState extends State<DoneScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final TodoProvider todoProvider = context.watch<TodoProvider>();
+    final doneMapList = todoProvider.getDoneTodosByDate();
+
+      // dailyBox를 기준으로 캘린더 이벤트 날짜 목록 생성
+      final events = <DateTime, List<Todo>>{};
+      for (final daily in doneMapList.keys) {
+        DateTime eventKey = DateTime.parse("${daily}T00:00:00Z");
+        events[eventKey] = doneMapList[daily] ?? [];
+      }
     return Scaffold(
       appBar: AppBar(
         title: const Text('Done Todos', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -38,40 +45,16 @@ class _DoneScreenState extends State<DoneScreen> {
           IconButton(
             icon: const Icon(Icons.backup),
             onPressed: () async {
+              
               // ICS 파일 생성
+              /*
               String icsContent = await generateIcsSchedule();
               kPrint(icsContent);
+              */
               }
       )],
       ),
-      body: ValueListenableBuilder(
-        valueListenable: Hive.box<Daily>('dailies').listenable(), // 1. 'dailies' Box 감시
-        builder: (context, Box<Daily> dailyBox, _) {
-          return ValueListenableBuilder(
-            valueListenable: Hive.box<Todo>('todos').listenable(), // 2. 'todos' Box 감시
-            builder: (context, Box<Todo> todoBox, _) {
-              // 이 안에서는 두 Box의 모든 변경에 반응합니다.
-              Daily? dailyForSelectedDay;
-              if (_selectedDay != null) {
-                try {
-                  final now = DateTime(_selectedDay!.year, _selectedDay!.month, _selectedDay!.day);
-                  dailyForSelectedDay = dailyBox.values.firstWhere(
-                    (daily) => isSameDay(daily.date, now),
-                  );
-                } catch (e) {
-                  // 해당 날짜에 Daily 객체가 없으면 dailyForSelectedDay는 null
-                }
-              }
-
-              // dailyBox를 기준으로 캘린더 이벤트 날짜 목록 생성
-              final events = <DateTime, List<Todo>>{};
-              for (final daily in dailyBox.values) {
-                // table_calendar는 UTC 기준이므로 키를 UTC 날짜로 변환합니다.
-                final date = DateTime.utc(daily.date.year, daily.date.month, daily.date.day);
-                events[date] = daily.content?.toList() ?? [];
-              }
-
-              return Column(
+      body:  Column(
                 children: [
                   DoneCalendar(
                     events: events,
@@ -87,15 +70,11 @@ class _DoneScreenState extends State<DoneScreen> {
                   const SizedBox(height: 8.0),
                   Expanded(
                     child: DoneTodoList(
-                      dailyForSelectedDay: dailyForSelectedDay,
+                     doneMapList: doneMapList, selectedDay: _selectedDay,
                     ),
                   ),
                 ],
+              )
               );
-            },
-          );
-        },
-      ),
-    );
-  }
+            }
 }
