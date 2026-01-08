@@ -27,7 +27,7 @@ class _DoneScreenState extends State<DoneScreen> {
   @override
   Widget build(BuildContext context) {
     final TodoProvider todoProvider = context.watch<TodoProvider>();
-    final doneMapList = todoProvider.getDoneTodosByDate();
+    final doneMapList = todoProvider.getDoneTodosByDate;
 
       // dailyBox를 기준으로 캘린더 이벤트 날짜 목록 생성
       final events = <DateTime, List<Todo>>{};

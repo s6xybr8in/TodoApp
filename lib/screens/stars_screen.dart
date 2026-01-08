@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todo/models/star.dart';
-import 'package:todo/providers/star_provider.dart';
+import 'package:todo/debug/debug.dart';
+import 'package:todo/models/todo.dart';
 import 'package:todo/providers/todo_provider.dart';
 import 'package:todo/theme/app_decorations.dart';
 import 'package:todo/widgets/star_list_item.dart';
@@ -16,10 +16,9 @@ class StarsScreen extends StatefulWidget {
 class _StarsScreenState extends State<StarsScreen> {
   @override
   Widget build(BuildContext context) {
-    final StarProvider starProvider = context.watch<StarProvider>();
     final TodoProvider todoProvider = context.watch<TodoProvider>();
-    List<Star> stars = starProvider.stars;
-    print('StarsScreen rebuild with ${stars.length} starred items');
+    List<Todo> stars = todoProvider.getStaredTodos;
+    kPrint('StarsScreen rebuild with ${stars.length} starred items');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Stars', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -36,9 +35,9 @@ class _StarsScreenState extends State<StarsScreen> {
               ListView.builder(
                 itemCount: stars.length,
                 itemBuilder: (context, index) {
-                  final todo = todoProvider.getTodo(stars[index].id);
+                  final todo = stars[index];
                   return StarListItem(
-                    todo: todo!,
+                    todo: todo,
                   );
                 },
               ),

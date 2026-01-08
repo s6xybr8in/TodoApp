@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo/models/importance.dart';
 import 'package:todo/models/todo.dart';
-import 'package:todo/providers/star_provider.dart';
 import 'package:todo/providers/todo_provider.dart';
 import 'package:todo/screens/todo_detail_screen.dart';
 import 'package:todo/theme/colors.dart';
@@ -18,7 +17,6 @@ class StarListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final TodoProvider todoProvider = context.watch<TodoProvider>();
-    final StarProvider starProvider = context.watch<StarProvider>();
     
     return GestureDetector(
       onTap: () {
@@ -53,7 +51,6 @@ class StarListItem extends StatelessWidget {
                 color: todo.isStared ? Colors.amber : Colors.grey,
               ),
               onPressed: () async{
-                await starProvider.deletebyID(todo.id);
                 context.read<TodoProvider>().toggleStar(todo);
               },
             ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:todo/models/importance.dart';
 import 'package:todo/models/todo.dart';
-import 'package:todo/providers/star_provider.dart';
 import 'package:todo/providers/todo_provider.dart';
 import 'package:todo/theme/colors.dart';
 
@@ -73,11 +72,6 @@ class TodoListItem extends StatelessWidget {
                       }
                     } else if (value == 'toggle_star'){
                       await todoProvider.toggleStar(todo);
-                      if (todo.isStared) {
-                        context.read<StarProvider>().addStar(todo.id);
-                      }else{
-                        context.read<StarProvider>().deletebyID(todo.id);
-                      }
                     }
                   },
                   itemBuilder: (BuildContext context) {

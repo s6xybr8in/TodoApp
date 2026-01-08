@@ -25,8 +25,6 @@ class TodoProvider extends ChangeNotifier {
     return todo;
   }
 
-
-
   Todo makeTodo(String title, Importance importance, {DateTime? startDate, DateTime? endDate}){
     return Todo(
           id: uid.v4(),
@@ -41,10 +39,11 @@ class TodoProvider extends ChangeNotifier {
     return date.toIso8601String().split('T')[0];
   }
 
+  List<Todo> get getActiveTodos => _todos.where((todo) => !todo.isDone).toList()..sort();
+  List<Todo> get getStaredTodos => _todos.where((todo) => todo.isStared).toList()..sort();
 
-  Map<String, List<Todo>> getDoneTodosByDate() {
+  Map<String, List<Todo>> get getDoneTodosByDate {
     Map<String, List<Todo>> doneTodosByDate = {};
-
     for (var todo in _todos) {
       if (todo.isDone) {
         String dateKey = getDateKey(todo.doneDate!);
@@ -54,11 +53,10 @@ class TodoProvider extends ChangeNotifier {
         doneTodosByDate[dateKey]!.add(todo);
       }
     }
-    notifyListeners();
     return doneTodosByDate;
   }
 
-  Map<String, List<Todo>> getProgressTodosByDate() {
+  Map<String, List<Todo>> get getProgressTodosByDate{
     Map<String, List<Todo>> progressTodosByDate = {};
 
     for (var todo in _todos) {
