@@ -1,30 +1,30 @@
 import 'package:flutter/material.dart';
 
 class TColors {
-  // Main Theme Colors
-  static const Color primaryColor = Color(0xFF4F46E5); // Indigo
-  static const Color secondaryColor = Color(0xFF7C3AED); // Violet
-  static const Color accentColor = Color(0xFFFF5722); // Deep Orange
+  // Main Theme Colors - 보라색 계열
+  static const Color primaryColor = Color(0xFF7C3AED); // 주 보라색
+  static const Color secondaryColor = Color(0xFF6D28D9); // 진한 보라색
+  static const Color accentColor = Color(0xFFA78BFA); // 밝은 보라색
 
   // App-specific Colors
-  static const Color backgroundColor = Color(0xFFFFFFFF);
-  static const Color textColor = Color(0xFF000000);
-  static const Color todoTextColor = Colors.black87;
-  static const Color doneTodoTextColor = Colors.grey;
+  static const Color backgroundColor = Color(0xFFFAFAFA); // 인스타그램 흰색
+  static const Color textColor = Color(0xFF111111);
+  static const Color todoTextColor = Color(0xFF1F2937);
+  static const Color doneTodoTextColor = Color(0xFF9CA3AF);
 
-  // Importance Colors
-  static const Color highImportanceColor = Color(0xFFE53935); // Material Red
-  static const Color mediumImportanceColor = secondaryColor; // Use theme secondary
-  static const Color lowImportanceColor = Color(0xFF42A5F5); // Light Blue
+  // Importance Colors - 보라색 톤
+  static const Color highImportanceColor = Color(0xFFC084FC); // 밝은 보라
+  static const Color mediumImportanceColor = Color(0xFF7C3AED); // 주 보라
+  static const Color lowImportanceColor = Color(0xFFDDD6FE); // 매우 밝은 보라
 
   // UI Element Colors
-  static const Color borderColor = Color(0xFFEEEEEE); // grey.shade200
-  static const Color shadowColor = Colors.grey;
-  static const Color dateColor = Colors.grey;
-  static const Color progressIndicatorBackgroundColor = Color(0xFFE0E0E0); // grey[200]
+  static const Color borderColor = Color(0xFFEBEBEB); // 밝은 그레이
+  static const Color shadowColor = Color(0xFFE5E7EB);
+  static const Color dateColor = Color(0xFF6B7280);
+  static const Color progressIndicatorBackgroundColor = Color(0xFFE0E0E0);
 
   // Calendar Colors
-  static const Color calendarMarkerColor = Color.fromARGB(255, 30, 0, 68); // Dark purple
-  static const Color calendarTodayDecoration = secondaryColor;
-  static const Color calendarSelectedDecoration = primaryColor;
+  static const Color calendarMarkerColor = Color(0xFF6D28D9); // 진한 보라
+  static const Color calendarTodayDecoration = Color(0xFF7C3AED); // 주 보라
+  static const Color calendarSelectedDecoration = Color(0xFFA78BFA); // 밝은 보라
 }

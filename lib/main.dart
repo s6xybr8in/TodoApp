@@ -4,8 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:todo/models/importance.dart';
 import 'package:todo/providers/todo_provider.dart';
 import 'package:todo/repositories/todo_repository.dart';
+import 'package:todo/theme/app_theme.dart';
 import '/models/todo.dart';
 import '/screens/main_screen.dart';
+
 int selectedIndex = 0;
 
 void main() async {
@@ -20,15 +22,17 @@ void main() async {
   // 'todos'라는 이름의 Box를 엽니다.
   await Hive.openBox<Todo>('todos');
 
-
   runApp(
-    MultiProvider(providers: 
-      [
-        Provider (create: (_)=> TodoRepository()),
-        ChangeNotifierProvider(create: (context) => TodoProvider(context.read<TodoRepository>())),
-      ]
-    ,child : const MyApp())
-    );
+    MultiProvider(
+      providers: [
+        Provider(create: (_) => TodoRepository()),
+        ChangeNotifierProvider(
+          create: (context) => TodoProvider(context.read<TodoRepository>()),
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -39,31 +43,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Todo App',
-      theme: ThemeData(
-        fontFamily: 'Pretendard',
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF4F46E5), // Primary color from SVG
-          primary: const Color(0xFF4F46E5), // Indigo
-          secondary: const Color(0xFF7C3AED), // Violet
-          surface: Colors.white
-          //background: Colors.white,
-          // Rest of the colors can be derived or set explicitly
-        ),
-        scaffoldBackgroundColor: Colors.white,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF4F46E5),
-          foregroundColor: Colors.white, // For title and icons
-        ),
-        floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: Color(0xFF4F46E5),
-          foregroundColor: Colors.white,
-        ),
-      ),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
       home: const MainScreen(),
     );
   }
 }
-
-
-

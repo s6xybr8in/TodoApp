@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:todo/models/importance.dart';
 import 'package:todo/models/todo.dart';
 import 'package:todo/providers/todo_provider.dart';
-
+import 'package:todo/theme/app_decorations.dart';
 
 class TodoDetailScreen extends StatefulWidget {
   final Todo? todo; // 수정할 Todo 항목. 새 항목 추가 시에는 null.
-  final TodoProvider todoProvider;  
   final String? title;
   final Importance? importance;
-  const TodoDetailScreen({super.key, this.todo, required this.todoProvider, this.title, this.importance});
+  const TodoDetailScreen({super.key, this.todo, this.title, this.importance});
 
   @override
   State<TodoDetailScreen> createState() => _TodoDetailScreenState();
@@ -29,8 +29,9 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
   void initState() {
     super.initState();
     // 기존 Todo 데이터가 있으면 해당 데이터로 초기화, 없으면 기본값으로 초기화
-    _title = widget.title ?? widget.todo?.title ?? ''; 
-    _importance = widget.importance ?? widget.todo?.importance ?? Importance.medium;
+    _title = widget.title ?? widget.todo?.title ?? '';
+    _importance =
+        widget.importance ?? widget.todo?.importance ?? Importance.medium;
     _progress = widget.todo?.progress ?? 0;
     DateTime initDate = DateTime.now();
     initDate = DateTime(initDate.year, initDate.month, initDate.day);
@@ -43,9 +44,25 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
   void _saveTodo() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
-
-      final newTodo = widget.todoProvider.makeTodo(_title, _importance);
-      await widget.todoProvider.addTodo(newTodo);
+      final todoProvider = context.read<TodoProvider>();
+      if (widget.todo == null) {
+        final newTodo = todoProvider.makeTodo(
+          _title,
+          _importance,
+          startDate: _startDate,
+          endDate: _endDate,
+        );
+        newTodo.progress = _progress;
+        await todoProvider.addTodo(newTodo);
+      } else {
+        final editing = widget.todo!;
+        editing.title = _title;
+        editing.importance = _importance;
+        editing.progress = _progress;
+        editing.startDate = _startDate;
+        editing.endDate = _endDate;
+        await todoProvider.updateTodo(editing);
+      }
 
       if (mounted) {
         Navigator.of(context).pop();
@@ -53,181 +70,250 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
     }
   }
 
+  String _formatDate(DateTime d) {
+    final mm = d.month.toString().padLeft(2, '0');
+    final dd = d.day.toString().padLeft(2, '0');
+    return '${d.year}.$mm.$dd';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final isEditing = widget.todo != null;
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.todo == null ? '새 Todo 추가' : 'Todo 수정'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.check),
-            onPressed: _saveTodo,
-            padding: const EdgeInsets.only(right: 20.0),
+        title: Text(
+          isEditing ? '할 일 수정' : '새로운 할 일',
+          style: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w600,
           ),
-        ],
+        ),
+        elevation: 0,
+        backgroundColor: const Color(0xFF7C3AED),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                initialValue: _title,
-                decoration: const InputDecoration(
-                  labelText: '할 일',
-                  border: OutlineInputBorder(),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '할 일을 입력해주세요.';
-                  }
-                  return null;
-                },
-                onSaved: (value) {
-                  _title = value!;
-                },
-              ),
-              const SizedBox(height: 16),
-              // 중요도 선택
-              DropdownButtonFormField<Importance>(
-                //value: _importance,
-                initialValue: _importance,
-                decoration: const InputDecoration(
-                  labelText: '중요도',
-                  border: OutlineInputBorder(),
-                ),
-                items: Importance.values.map((importance) {
-                  return DropdownMenuItem(
-                    value: importance,
-                    child: Text(importance.name),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _importance = value!;
-                  });
-                },
-              ),
-              const SizedBox(height: 16),
-              // 진행률 슬라이더
-              Row(
-                children: [
-                  const Text('진행률'),
-                  Expanded(
-                    child: Slider(
-                      value: _progress.toDouble(),
-                      min: 0,
-                      max: 100,
-                      divisions: 10,
-                      label: '$_progress%',
-                      onChanged: (value) {
-                        setState(() {
-                          _progress = value.round();
-                        });
-                      },
-                    ),
+      body: Form(
+        key: _formKey,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            // Title
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: TextFormField(
+                  initialValue: _title,
+                  decoration: const InputDecoration(
+                    labelText: '할 일',
+                    hintText: '무엇을 할까요?',
                   ),
-                  Text('$_progress%'),
-                ],
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return '할 일을 입력해주세요.';
+                    }
+                    return null;
+                  },
+                  onSaved: (value) => _title = value!.trim(),
+                ),
               ),
-              const SizedBox(height: 16),
-              // 반복 주기
-              if (widget.todo == null) // 새 Todo 추가 시에만 반복 주기 표시
-                Column(
+            ),
+
+            const SizedBox(height: 12),
+
+            // Importance
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('중요도', style: Theme.of(context).textTheme.titleMedium),
+                    const SizedBox(height: 12),
+                    Wrap(
+                      spacing: 8,
+                      children: Importance.values.map((imp) {
+                        final selected = _importance == imp;
+                        return ChoiceChip(
+                          selected: selected,
+                          label: Text(imp.name),
+                          onSelected: (_) => setState(() => _importance = imp),
+                          selectedColor: scheme.primaryContainer,
+                          labelStyle: TextStyle(
+                            color: selected
+                                ? scheme.onPrimaryContainer
+                                : scheme.onSurface,
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Progress
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
-                        Checkbox(
-                          value: _isRepetitive,
-                          onChanged: (value) {
-                            setState(() {
-                              _isRepetitive = value!;
-                              if (_isRepetitive && _repetitionDays == 0) {
-                                _repetitionDays = 1; // Default to 1 day if repetition is enabled
-                              } else if (!_isRepetitive) {
-                                _repetitionDays = 0; // Reset if repetition is disabled
-                              }
-                            });
-                          },
+                        Text(
+                          '진행률',
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
-                        const Text('반복 설정'),
+                        const Spacer(),
+                        Text('$_progress%'),
                       ],
                     ),
-                    if (_isRepetitive)
-                      TextFormField(
-                        initialValue: _repetitionDays.toString(),
-                        decoration: const InputDecoration(
-                          labelText: '반복 간격 (일)',
-                          border: OutlineInputBorder(),
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (_isRepetitive && (value == null || value.isEmpty || int.tryParse(value) == null || int.parse(value) <= 0)) {
-                            return '유효한 반복 간격(일)을 입력해주세요.';
-                          }
-                          return null;
-                        },
-                        onSaved: (value) {
-                          _repetitionDays = int.tryParse(value!) ?? 0;
-                        },
-                        onChanged: (value) {
-                          setState(() {
-                            _repetitionDays = int.tryParse(value) ?? 0;
-                          });
-                        },
-                      ),
+                    Slider(
+                      value: _progress.toDouble(),
+                      min: 0,
+                      max: 100,
+                      divisions: 20,
+                      label: '$_progress%',
+                      onChanged: (value) =>
+                          setState(() => _progress = value.round()),
+                    ),
                   ],
                 ),
-              if (widget.todo != null) const SizedBox(height: 16),
-              // 날짜 선택 (간단한 버튼으로 구현)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Dates
+            Card(
+              child: Column(
                 children: [
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.calendar_today),
-                    label: Text(
-                        '시작: ${_startDate.toString().substring(5, 10)}'),
-                    onPressed: () async {
+                  ListTile(
+                    leading: const Icon(Icons.flag),
+                    title: const Text('시작일'),
+                    trailing: Text(_formatDate(_startDate)),
+                    onTap: () async {
                       final date = await showDatePicker(
                         context: context,
                         initialDate: _startDate,
                         firstDate: DateTime(2020),
-                        lastDate: DateTime(2030),
+                        lastDate: DateTime(2035),
                       );
                       if (date != null) {
                         setState(() {
-                          _startDate = date;
+                          _startDate = DateTime(
+                            date.year,
+                            date.month,
+                            date.day,
+                          );
+                          if (_endDate.isBefore(_startDate)) {
+                            _endDate = _startDate;
+                          }
                         });
                       }
                     },
                   ),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.calendar_today),
-                    label: Text(
-                        '종료: ${_endDate.toString().substring(5, 10)}'),
-                    onPressed: () async {
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.check_circle),
+                    title: const Text('종료일'),
+                    trailing: Text(_formatDate(_endDate)),
+                    onTap: () async {
                       final date = await showDatePicker(
                         context: context,
-                        initialDate: _endDate,
+                        initialDate: _endDate.isBefore(_startDate)
+                            ? _startDate
+                            : _endDate,
                         firstDate: _startDate,
-                        lastDate: DateTime(2030),
+                        lastDate: DateTime(2035),
                       );
                       if (date != null) {
                         setState(() {
-                          _endDate = date;
+                          _endDate = DateTime(date.year, date.month, date.day);
                         });
                       }
                     },
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+
+            const SizedBox(height: 12),
+
+            if (widget.todo == null)
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
+                    children: [
+                      SwitchListTile(
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                        ),
+                        title: const Text('반복 설정'),
+                        value: _isRepetitive,
+                        onChanged: (v) {
+                          setState(() {
+                            _isRepetitive = v;
+                            if (_isRepetitive && _repetitionDays == 0) {
+                              _repetitionDays = 1;
+                            } else if (!_isRepetitive) {
+                              _repetitionDays = 0;
+                            }
+                          });
+                        },
+                      ),
+                      AnimatedCrossFade(
+                        duration: const Duration(milliseconds: 200),
+                        crossFadeState: _isRepetitive
+                            ? CrossFadeState.showFirst
+                            : CrossFadeState.showSecond,
+                        firstChild: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                          child: TextFormField(
+                            initialValue: _repetitionDays.toString(),
+                            decoration: const InputDecoration(
+                              labelText: '반복 간격 (일)',
+                            ),
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (_isRepetitive &&
+                                  (value == null ||
+                                      value.isEmpty ||
+                                      int.tryParse(value) == null ||
+                                      int.parse(value) <= 0)) {
+                                return '유효한 반복 간격(일)을 입력해주세요.';
+                              }
+                              return null;
+                            },
+                            onSaved: (value) => _repetitionDays =
+                                int.tryParse(value ?? '') ?? 0,
+                            onChanged: (value) => setState(
+                              () => _repetitionDays = int.tryParse(value) ?? 0,
+                            ),
+                          ),
+                        ),
+                        secondChild: const SizedBox.shrink(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+            const SizedBox(height: 24),
+            SafeArea(
+              top: false,
+              child: ElevatedButton(
+                onPressed: _saveTodo,
+                child: const Text('저장'),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-
-

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:todo/screens/done_screen.dart';
+import 'package:todo/screens/calendar_screen.dart';
 import 'package:todo/screens/home_screen.dart';
 import 'package:todo/screens/stars_screen.dart';
 
@@ -15,7 +15,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const DoneScreen(),
+    const CalendarScreen(),
     const StarsScreen(),
   ];
 

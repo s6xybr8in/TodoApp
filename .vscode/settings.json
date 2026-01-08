@@ -1,3 +1,5 @@
 {
-    "dart.flutterSdkPath": "~/Desktop/03_Coding/Flutter/flutter"
+    "dart.flutterSdkPath": "~/Desktop/03_Coding/Flutter/flutter",
+    "doki.wallpaper.path": "~/Pictures/nike/4.jpeg",
+    "doki.wallpaper.enabled": true
 }

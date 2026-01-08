@@ -5,12 +5,12 @@ class TodoRepository {
   final Box<Todo> _box;
   TodoRepository() : _box = Hive.box<Todo>('todos');
   List<Todo> getAllTodos() => _box.values.toList();
-
+  // curd operations
   Future<void> save(Todo todo) async {
     await _box.put(todo.id, todo);
   }
 
-  Todo? getTodoById(String id) {
+  Todo? select(String id) {
     return _box.get(id);
   }
 

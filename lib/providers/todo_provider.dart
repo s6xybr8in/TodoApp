@@ -6,7 +6,7 @@ import 'package:uuid/uuid.dart';
 
 class TodoProvider extends ChangeNotifier {
   final Uuid uid = Uuid();
-  final TodoRepository _todoRepository; 
+  final TodoRepository _todoRepository;
   final List<Todo> _todos;
   List<Todo> get todos => _todos;
   TodoProvider(this._todoRepository) : _todos = _todoRepository.getAllTodos();
@@ -25,24 +25,36 @@ class TodoProvider extends ChangeNotifier {
     return todo;
   }
 
-  Todo makeTodo(String title, Importance importance, {DateTime? startDate, DateTime? endDate}){
+  Future<void> updateTodo(Todo todo) async {
+    await _todoRepository.update(todo);
+    notifyListeners();
+  }
+
+  Todo makeTodo(
+    String title,
+    Importance importance, {
+    DateTime? startDate,
+    DateTime? endDate,
+  }) {
     return Todo(
-          id: uid.v4(),
-          title: title,
-          importance: importance,
-          startDate: startDate ?? DateTime.now(),
-          endDate: endDate ?? DateTime.now(),
-        );
+      id: uid.v4(),
+      title: title,
+      importance: importance,
+      startDate: startDate ?? DateTime.now(),
+      endDate: endDate ?? DateTime.now(),
+    );
   }
 
   String getDateKey(DateTime date) {
     return date.toIso8601String().split('T')[0];
   }
 
-  List<Todo> get getActiveTodos => _todos.where((todo) => !todo.isDone).toList()..sort();
-  List<Todo> get getStaredTodos => _todos.where((todo) => todo.isStared).toList()..sort();
+  List<Todo> get activeTodos =>
+      _todos.where((todo) => !todo.isDone).toList()..sort();
+  List<Todo> get staredTodos =>
+      _todos.where((todo) => todo.isStared).toList()..sort();
 
-  Map<String, List<Todo>> get getDoneTodosByDate {
+  Map<String, List<Todo>> get doneTodosByDate {
     Map<String, List<Todo>> doneTodosByDate = {};
     for (var todo in _todos) {
       if (todo.isDone) {
@@ -56,12 +68,16 @@ class TodoProvider extends ChangeNotifier {
     return doneTodosByDate;
   }
 
-  Map<String, List<Todo>> get getProgressTodosByDate{
+  Map<String, List<Todo>> get progressTodosByDate {
     Map<String, List<Todo>> progressTodosByDate = {};
 
     for (var todo in _todos) {
       if (!todo.isDone) {
-        for(var date = todo.startDate; date.isBefore(todo.endDate.add(const Duration(days:1))); date = date.add(const Duration(days:1))){
+        for (
+          var date = todo.startDate;
+          date.isBefore(todo.endDate.add(const Duration(days: 1)));
+          date = date.add(const Duration(days: 1))
+        ) {
           String dateKey = getDateKey(date);
           if (!progressTodosByDate.containsKey(dateKey)) {
             progressTodosByDate[dateKey] = [];
@@ -72,9 +88,6 @@ class TodoProvider extends ChangeNotifier {
     }
     return progressTodosByDate;
   }
-
-
-
 
   Future<void> toggleDone(Todo todo) async {
     todo.isDone = !todo.isDone;
@@ -91,7 +104,6 @@ class TodoProvider extends ChangeNotifier {
   }
 
   Todo? getTodo(String id) {
-    return _todoRepository.getTodoById(id);
+    return _todoRepository.select(id);
   }
-
 }

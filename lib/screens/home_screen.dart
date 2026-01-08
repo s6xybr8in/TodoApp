@@ -16,42 +16,41 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final TodoProvider todoProvider = context.watch<TodoProvider>();
-    List<Todo> todos = todoProvider.todos.where((todo) => !todo.isDone).toList();
+    List<Todo> todos = todoProvider.activeTodos;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Todo App', style: TextStyle(fontWeight: FontWeight.bold)),
-        elevation: 0, // for a flatter look
-        flexibleSpace: Container(
-          decoration: kAppBarDecoration,
+        title: const Text(
+          '오늘의 할 일',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
         ),
+        elevation: 0,
+        backgroundColor: const Color(0xFF7C3AED),
       ),
-      body:  todos.isEmpty
-          ? const Center(
-              child: Text('투두가 없어요! 새로운 투두를 추가해보세요.'),
-            ) :
-            ListView.builder(
-            itemCount: todos.length,
-            itemBuilder: (context, index) {
-              final todo = todos[index];
-              return TodoListItem(
-                todo: todo,
-                onTap: () {
-                  // 수정 화면으로 이동
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => TodoDetailScreen(todo: todo, todoProvider: todoProvider),
-                    ),
-                  );
-                },
-              );
-            },
-      ),
+      body: todos.isEmpty
+          ? const Center(child: Text('투두가 없어요! 새로운 투두를 추가해보세요.'))
+          : ListView.builder(
+              itemCount: todos.length,
+              itemBuilder: (context, index) {
+                final todo = todos[index];
+                return TodoListItem(
+                  todo: todo,
+                  onTap: () {
+                    // 수정 화면으로 이동
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => TodoDetailScreen(todo: todo),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           // 추가 화면으로 이동
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => TodoDetailScreen(todoProvider: todoProvider)),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (context) => TodoDetailScreen()));
         },
         tooltip: '새로운 투두 추가',
         child: const Icon(Icons.add),
