@@ -1,5 +1,25 @@
 {
     "dart.flutterSdkPath": "~/Desktop/03_Coding/Flutter/flutter",
-    "doki.wallpaper.path": "~/Pictures/nike/4.jpeg",
-    "doki.wallpaper.enabled": true
+    // 1. 파일 중첩 (File Nesting) 설정
+    "explorer.fileNesting.enabled": true,
+    "explorer.fileNesting.expand": false,
+    "explorer.fileNesting.patterns": {
+        "pubspec.yaml": "pubspec.lock, .flutter-plugins, .flutter-plugins-dependencies, .metadata",
+        "*.dart": "$(capture).g.dart, $(capture).freezed.dart, $(capture).nm.dart",
+        ".gitignore": ".gitattributes, .gitmodules",
+        "README.md": "CHANGELOG.md, LICENSE, AUTHORS"
+    },
+    // 2. 플러터 개발 생산성 설정
+    "editor.formatOnSave": true, // 저장 시 자동 정렬 (고수 필수)
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "always",
+        "source.organizeImports": "always" // 임포트 자동 정리
+    },
+    "dart.previewFlutterUiGuides": true, // UI 가이드 라인 표시
+    "dart.closingLabels": true, // 위젯 끝부분에 주석 표시 (ex: // Scaffold)
+    // 3. 편집기 가독성 설정
+    "editor.bracketPairColorization.enabled": true, // 괄호 색상 구분
+    "editor.guides.bracketPairs": "active", // 활성화된 괄호 연결선 표시
+    "editor.renderWhitespace": "boundary", // 공백 표시
+    "editor.fontLigatures": true // 폰트 리가처 활성화
 }

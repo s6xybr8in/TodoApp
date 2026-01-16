@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:todo/features/calendar/widgets/base_calendar.dart';
+import 'package:todo/features/calendar/widgets/calendar_todo_list.dart';
 import 'package:todo/providers/todo_provider.dart';
 import 'package:todo/theme/colors.dart';
-import 'package:todo/widgets/calendar/base_calendar.dart';
-import 'package:todo/widgets/calendar/calendar_todo_list.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key});
@@ -45,7 +45,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     ButtonSegment<bool>(
                       value: true,
                       icon: Icon(Icons.schedule),
-                      // label: Text("진행중"), 
+                      // label: Text("진행중"),
                     ),
                     ButtonSegment<bool>(
                       value: false,
@@ -62,17 +62,12 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ),
               ),
             ),
-            const Text('달력',
-                style:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+            const Text('달력'),
           ],
         ),
-        elevation: 0,
-        backgroundColor: const Color(0xFF7C3AED),
         actions: [
           IconButton(
             icon: const Icon(Icons.backup),
-            color: Colors.white,
             onPressed: () async {
               // ICS 파일 생성
               /*

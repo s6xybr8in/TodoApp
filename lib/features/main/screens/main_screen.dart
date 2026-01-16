@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:todo/screens/calendar_screen.dart';
-import 'package:todo/screens/home_screen.dart';
-import 'package:todo/screens/stars_screen.dart';
+import 'package:todo/features/statistics/screens/statistics_screen.dart';
+import 'package:todo/features/stopwatch/screens/stop_watch_screen.dart';
+import 'package:todo/features/todo/screens/home_screen.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -15,8 +15,10 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     const HomeScreen(),
-    const CalendarScreen(),
-    const StarsScreen(),
+    // const CalendarScreen(),
+    // const StarsScreen(),
+    const StopWatchScreen(),
+    const StatisticsScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -31,17 +33,16 @@ class _MainScreenState extends State<MainScreen> {
       body: _screens[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          // BottomNavigationBarItem(
+          //   icon: Icon(Icons.calendar_month),
+          //   label: 'Calendar',
+          // ),
+          // BottomNavigationBarItem(icon: Icon(Icons.star), label: 'Stars'),
+          BottomNavigationBarItem(icon: Icon(Icons.timer), label: 'Stopwatch'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.done),
-            label: 'Done',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.star),
-            label: 'Stars',
+            icon: Icon(Icons.bar_chart),
+            label: 'Statistics',
           ),
         ],
         currentIndex: _selectedIndex,

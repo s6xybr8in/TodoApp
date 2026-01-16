@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:todo/models/importance.dart';
 import 'package:todo/models/todo.dart';
 import 'package:todo/providers/todo_provider.dart';
-import 'package:todo/theme/app_decorations.dart';
 
 class TodoDetailScreen extends StatefulWidget {
   final Todo? todo; // 수정할 Todo 항목. 새 항목 추가 시에는 null.
@@ -19,9 +18,10 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
   final _formKey = GlobalKey<FormState>();
   late String _title;
   late Importance _importance;
-  late int _progress;
+  late double _progress;
   late DateTime _startDate;
   late DateTime _endDate;
+  String? _category;
   late int _repetitionDays;
   late bool _isRepetitive;
 
@@ -32,11 +32,14 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
     _title = widget.title ?? widget.todo?.title ?? '';
     _importance =
         widget.importance ?? widget.todo?.importance ?? Importance.medium;
-    _progress = widget.todo?.progress ?? 0;
+    _progress = widget.todo?.progress ?? 0.0;
+    _category = widget.todo?.category;
+
     DateTime initDate = DateTime.now();
     initDate = DateTime(initDate.year, initDate.month, initDate.day);
     _startDate = widget.todo?.startDate ?? initDate;
     _endDate = widget.todo?.endDate ?? initDate;
+
     _repetitionDays = 0;
     _isRepetitive = false;
   }
@@ -47,12 +50,14 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
       final todoProvider = context.read<TodoProvider>();
       if (widget.todo == null) {
         final newTodo = todoProvider.makeTodo(
-          _title,
-          _importance,
+          title: _title,
+          importance: _importance,
           startDate: _startDate,
           endDate: _endDate,
         );
         newTodo.progress = _progress;
+        newTodo.category = _category;
+
         await todoProvider.addTodo(newTodo);
       } else {
         final editing = widget.todo!;
@@ -61,6 +66,7 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
         editing.progress = _progress;
         editing.startDate = _startDate;
         editing.endDate = _endDate;
+        editing.category = _category;
         await todoProvider.updateTodo(editing);
       }
 
@@ -81,17 +87,7 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
     final scheme = Theme.of(context).colorScheme;
     final isEditing = widget.todo != null;
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          isEditing ? '할 일 수정' : '새로운 할 일',
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        elevation: 0,
-        backgroundColor: const Color(0xFF7C3AED),
-      ),
+      appBar: AppBar(title: Text(isEditing ? '할 일 수정' : '새로운 할 일')),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -120,6 +116,23 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
 
             const SizedBox(height: 12),
 
+            // Category
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: TextFormField(
+                  initialValue: _category,
+                  decoration: const InputDecoration(
+                    labelText: '카테고리',
+                    hintText: '예: 업무, 공부, 운동 (선택사항)',
+                  ),
+                  onSaved: (value) => _category = value?.trim(),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
             // Importance
             Card(
               child: Padding(
@@ -137,12 +150,6 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
                           selected: selected,
                           label: Text(imp.name),
                           onSelected: (_) => setState(() => _importance = imp),
-                          selectedColor: scheme.primaryContainer,
-                          labelStyle: TextStyle(
-                            color: selected
-                                ? scheme.onPrimaryContainer
-                                : scheme.onSurface,
-                          ),
                         );
                       }).toList(),
                     ),
@@ -168,17 +175,16 @@ class _TodoDetailScreenState extends State<TodoDetailScreen> {
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         const Spacer(),
-                        Text('$_progress%'),
+                        Text('${(_progress * 100).round()}%'),
                       ],
                     ),
                     Slider(
-                      value: _progress.toDouble(),
-                      min: 0,
-                      max: 100,
+                      value: _progress,
+                      min: 0.0,
+                      max: 1.0,
                       divisions: 20,
-                      label: '$_progress%',
-                      onChanged: (value) =>
-                          setState(() => _progress = value.round()),
+                      label: '${(_progress * 100).round()}%',
+                      onChanged: (value) => setState(() => _progress = value),
                     ),
                   ],
                 ),

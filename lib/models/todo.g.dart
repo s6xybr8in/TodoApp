@@ -18,42 +18,54 @@ class TodoAdapter extends TypeAdapter<Todo> {
     };
     return Todo(
       id: fields[0] as String,
-      title: fields[1] as String,
-      importance: fields[2] as Importance,
-      progress: fields[3] as int,
-      startDate: fields[4] as DateTime,
-      endDate: fields[5] as DateTime,
-      isDone: fields[6] as bool,
-      doneDate: fields[7] as DateTime?,
-      repetitionId: fields[8] as String,
-      isStared: fields[9] as bool,
+      title: fields[2] as String,
+      importance: fields[7] as Importance,
+      progress: fields[4] as double,
+      startDate: fields[8] as DateTime,
+      endDate: fields[9] as DateTime,
+      status: fields[6] as TodoStatus,
+      childrenIds: (fields[1] as List?)?.cast<String>(),
+      category: fields[11] as String?,
+      isStared: fields[5] as bool,
+      repetitionId: fields[12] as String?,
+      checkedDate: fields[10] as DateTime?,
+      parentId: fields[13] as String?,
+      completeCount: fields[3] as int,
     );
   }
 
   @override
   void write(BinaryWriter writer, Todo obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(14)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.title)
+      ..write(obj.childrenIds)
       ..writeByte(2)
-      ..write(obj.importance)
+      ..write(obj.title)
       ..writeByte(3)
-      ..write(obj.progress)
+      ..write(obj.completeCount)
       ..writeByte(4)
-      ..write(obj.startDate)
+      ..write(obj.progress)
       ..writeByte(5)
-      ..write(obj.endDate)
+      ..write(obj.isStared)
       ..writeByte(6)
-      ..write(obj.isDone)
+      ..write(obj.status)
       ..writeByte(7)
-      ..write(obj.doneDate)
+      ..write(obj.importance)
       ..writeByte(8)
-      ..write(obj.repetitionId)
+      ..write(obj.startDate)
       ..writeByte(9)
-      ..write(obj.isStared);
+      ..write(obj.endDate)
+      ..writeByte(10)
+      ..write(obj.checkedDate)
+      ..writeByte(11)
+      ..write(obj.category)
+      ..writeByte(12)
+      ..write(obj.repetitionId)
+      ..writeByte(13)
+      ..write(obj.parentId);
   }
 
   @override

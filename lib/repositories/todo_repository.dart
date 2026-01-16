@@ -6,7 +6,7 @@ class TodoRepository {
   TodoRepository() : _box = Hive.box<Todo>('todos');
   List<Todo> getAllTodos() => _box.values.toList();
   // curd operations
-  Future<void> save(Todo todo) async {
+  Future<void> create(Todo todo) async {
     await _box.put(todo.id, todo);
   }
 
